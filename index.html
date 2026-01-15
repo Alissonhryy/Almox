@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Controle de Estoque - Ceará Sem Fome (Melhorado)</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1605,6 +1605,69 @@
         padding: 16px;
       }
     }
+
+    /* Mobile - Melhorias específicas */
+    @media (max-width: 480px) {
+      /* Cards compactáveis - esconder item-meta por padrão */
+      .item-meta {
+        display: none;
+      }
+
+      .item-card.expanded .item-meta {
+        display: flex;
+      }
+
+      /* Botões de ação maiores (thumb friendly) */
+      .action-btn {
+        padding: 14px;
+        font-size: 18px;
+      }
+
+      /* Filtros colapsáveis */
+      .filter-buttons {
+        display: none;
+        margin-top: 12px;
+      }
+
+      .filter-buttons.active {
+        display: grid;
+      }
+
+      #mobile-filters-btn {
+        display: flex;
+      }
+
+      /* Header mobile - esconder texto do theme toggle */
+      #theme-text {
+        display: none;
+      }
+
+      /* Modais estilo bottom-sheet */
+      .modal-content {
+        border-radius: 20px 20px 0 0;
+        max-height: 90vh;
+        margin-top: auto;
+        margin-bottom: 0;
+        padding-bottom: max(24px, env(safe-area-inset-bottom));
+      }
+
+      .modal {
+        align-items: flex-end;
+        padding: 0;
+      }
+
+      /* Feedback visual de toque */
+      .action-btn:active,
+      .filter-btn:active,
+      .fab:active,
+      .submit-btn:active,
+      .item-edit-btn:active,
+      .btn-minimalist:active,
+      .quick-btn:active,
+      .project-action-btn:active {
+        transform: scale(0.96);
+      }
+    }
   </style>
 </head>
 <body>
@@ -1709,8 +1772,14 @@
       <!-- Página de Estoque -->
       <div id="inventory-page" class="page-content active">
         <div class="search-bar">
-          <input type="text" class="search-input" placeholder="🔍 Buscar itens..." id="search-input" oninput="filterItems(this.value)">
-          <div class="filter-buttons">
+          <div style="display: flex; gap: 8px; width: 100%;">
+            <input type="text" class="search-input" placeholder="🔍 Buscar itens..." id="search-input" oninput="filterItems(this.value)" style="flex: 1;">
+            <button class="btn-minimalist" id="mobile-filters-btn" onclick="toggleFilters()" style="display: none;">
+              <span class="material-icons">filter_list</span>
+              <span>Filtros</span>
+            </button>
+          </div>
+          <div class="filter-buttons" id="filter-buttons">
             <button class="filter-btn active" onclick="setLocationFilter('all', this)">Todos</button>
             <button class="filter-btn" onclick="setLocationFilter('ADM', this)">ADM</button>
             <button class="filter-btn" onclick="setLocationFilter('IAC-SOCIAL', this)">IAC-SOCIAL</button>
@@ -2900,6 +2969,19 @@
     
     // Expor funções para módulos ES6 do Firebase (após definições)
     window.renderInventory = renderInventory;
+    window.toggleCardExpand = function(card) {
+      // Só funciona no mobile
+      if (window.innerWidth > 480) return;
+      
+      // Remover expanded de outros cards
+      document.querySelectorAll('.item-card.expanded').forEach(c => {
+        if (c !== card) c.classList.remove('expanded');
+      });
+      
+      // Toggle do card clicado
+      card.classList.toggle('expanded');
+    };
+    window.toggleFilters = toggleFilters;
     window.showMainContent = showMainContent;
     window.showLogin = showLogin;
     window.updateUserInfo = updateUserInfo;
@@ -3047,7 +3129,7 @@
         };
         
         return `
-          <div class="item-card">
+          <div class="item-card" onclick="toggleCardExpand(this)" style="cursor: pointer;">
             <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px;">
               <div class="item-code" style="font-size: 11px; color: var(--text-secondary); background: var(--bg-secondary); padding: 4px 10px; border-radius: 8px; font-weight: 500;">${item.code || 'N/A'}</div>
               <div style="display: flex; align-items: center; gap: 6px;">
@@ -3073,7 +3155,7 @@
               </div>` : ''}
             </div>
             
-            <div class="item-actions">
+            <div class="item-actions" onclick="event.stopPropagation()">
               <button class="action-btn btn-add" onclick="openActionModal('${String(item.id || item.code)}', 'add')" title="Adicionar">
                 <span class="material-icons">add</span>
               </button>
@@ -3082,7 +3164,7 @@
                 <span class="material-icons">remove</span>
               </button>
             </div>
-            <div class="item-card-actions">
+            <div class="item-card-actions" onclick="event.stopPropagation()">
               <button class="item-edit-btn" onclick="openEditItemModal('${String(item.id || item.code)}')" title="Editar">
                 <span class="material-icons">edit</span>
               </button>
@@ -3986,10 +4068,17 @@
         renderCategoriesList();
       }
       
-      // Atualizar FAB contextual
-      updateFAB(page);
-      
-      toggleSidebar();
+      // Fechar sidebar no mobile ao navegar
+      if (window.innerWidth <= 768) {
+        toggleSidebar();
+      }
+    }
+
+    function toggleFilters() {
+      const filterButtons = document.getElementById('filter-buttons');
+      if (filterButtons) {
+        filterButtons.classList.toggle('active');
+      }
     }
 
     function updateFAB(page) {

@@ -173,12 +173,21 @@
             if (window.startFirestoreSync) {
               window.startFirestoreSync();
             }
+            if (window.startWithdrawalsSync) {
+              window.startWithdrawalsSync();
+            }
           }, 500);
         }
       } else {
         // Usuário não autenticado - parar sincronização
         if (window.stopFirestoreSync) {
           window.stopFirestoreSync();
+        }
+        
+        // Parar sincronização de withdrawals
+        if (withdrawalsUnsubscribe) {
+          withdrawalsUnsubscribe();
+          withdrawalsUnsubscribe = null;
         }
         
         if (window.setCurrentUser && window.showLogin) {
@@ -257,6 +266,28 @@
       max-width: 400px;
       width: 100%;
       border: 1px solid var(--border-color);
+      position: relative;
+    }
+
+    .login-checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 12px;
+      margin-bottom: 8px;
+    }
+
+    .login-checkbox-group input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+
+    .login-checkbox-group label {
+      font-size: 14px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      user-select: none;
     }
 
     .login-title {
@@ -367,24 +398,62 @@
       height: 50px;
     }
 
+    .logo-svg {
+      width: 60px;
+      height: 60px;
+      display: inline-block;
+    }
+
+    .logo-svg-small {
+      width: 40px;
+      height: 40px;
+      display: inline-block;
+    }
+
+    .logo-svg svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .logo-svg svg {
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+    }
+
+    [data-theme="dark"] .logo-svg svg {
+      filter: drop-shadow(0 2px 4px rgba(255, 255, 255, 0.1));
+    }
+
+    .login-logo {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .login-logo .logo-svg {
+      width: 80px;
+      height: 80px;
+    }
+
     .menu-btn {
-      background: var(--gov-blue);
-      color: white;
+      background: transparent;
+      color: var(--text-primary);
       border: none;
-      padding: 10px 16px;
-      border-radius: 10px;
+      padding: 8px;
+      border-radius: 8px;
       cursor: pointer;
-      font-weight: 600;
-      font-size: 14px;
       display: flex;
       align-items: center;
-      gap: 8px;
+      justify-content: center;
       transition: all 0.2s;
+      width: 40px;
+      height: 40px;
     }
 
     .menu-btn:hover {
-      transform: scale(1.02);
-      box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+      background: var(--bg-secondary);
+    }
+
+    .menu-btn .material-icons {
+      font-size: 24px;
     }
 
     .theme-toggle {
@@ -496,10 +565,10 @@
     }
 
     .filter-btn.active {
-      background: var(--gov-blue);
-      color: white;
+      background: transparent;
+      color: var(--gov-blue);
       border-color: var(--gov-blue);
-      box-shadow: 0 2px 8px rgba(74, 144, 226, 0.3);
+      box-shadow: none;
     }
 
     .inventory-grid {
@@ -615,7 +684,7 @@
     }
 
     .item-quantity {
-      font-size: 48px;
+      font-size: 40px;
       font-weight: 800;
       text-align: left;
       line-height: 1;
@@ -643,6 +712,27 @@
       opacity: 0.7;
     }
 
+    .badge {
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 8px;
+      background: rgba(74, 144, 226, 0.1);
+      color: var(--gov-blue);
+      font-weight: 500;
+      display: inline-block;
+      margin: 2px 0;
+    }
+
+    .badge.location {
+      background: rgba(124, 179, 66, 0.1);
+      color: var(--gov-green);
+    }
+
+    .badge.project {
+      background: rgba(74, 144, 226, 0.1);
+      color: var(--gov-blue);
+    }
+
     .item-meta {
       display: flex;
       flex-direction: column;
@@ -661,48 +751,333 @@
 
     .action-btn {
       flex: 1;
-      padding: 10px;
-      border: none;
+      padding: 8px;
+      border: 1px solid var(--border-color);
       border-radius: 8px;
-      font-size: 18px;
-      font-weight: 700;
+      font-size: 16px;
+      font-weight: 500;
       cursor: pointer;
       transition: all 0.2s;
       display: flex;
       align-items: center;
       justify-content: center;
+      background: var(--card-bg);
+      color: var(--text-primary);
     }
 
     .btn-add {
-      background: var(--gov-green);
-      color: white;
+      border-color: var(--gov-green);
+      color: var(--gov-green);
+    }
+
+    .btn-add:hover {
+      background: rgba(124, 179, 66, 0.1);
+      border-color: var(--gov-green);
     }
 
     .btn-remove {
-      background: var(--gov-red);
-      color: white;
+      border-color: var(--gov-red);
+      color: var(--gov-red);
       position: relative;
     }
 
-    .btn-remove.dangerous {
-      background: linear-gradient(135deg, #E53935 0%, #C62828 100%);
-      box-shadow: 0 4px 12px rgba(229, 57, 53, 0.4);
-      animation: pulse-danger 2s infinite;
+    .btn-remove:hover {
+      background: rgba(229, 57, 53, 0.1);
+      border-color: var(--gov-red);
     }
 
-    @keyframes pulse-danger {
-      0%, 100% { box-shadow: 0 4px 12px rgba(229, 57, 53, 0.4); }
-      50% { box-shadow: 0 4px 20px rgba(229, 57, 53, 0.6); }
+    .btn-remove.dangerous {
+      background: rgba(229, 57, 53, 0.15);
+      border-color: var(--gov-red);
     }
 
     .action-btn:hover {
-      transform: scale(1.05);
+      transform: none;
     }
 
     .action-btn:disabled {
       opacity: 0.5;
       cursor: not-allowed;
       transform: none;
+    }
+
+    /* Botão Flutuante */
+    .fab {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--card-bg);
+      color: var(--gov-blue);
+      border: 1px solid var(--border-color);
+      box-shadow: var(--card-shadow);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      z-index: 999;
+      transition: all 0.2s;
+    }
+
+    .fab:hover {
+      background: var(--bg-secondary);
+      border-color: var(--gov-blue);
+      transform: none;
+      box-shadow: var(--card-shadow);
+    }
+
+    .fab:active {
+      transform: scale(0.95);
+    }
+
+    /* Botões de ação no card */
+    .item-card-actions {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 12px;
+    }
+
+    .item-edit-btn {
+      width: 28px;
+      height: 28px;
+      padding: 0;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      color: var(--text-secondary);
+      opacity: 0.6;
+    }
+
+    .item-edit-btn:hover {
+      background: var(--bg-secondary);
+      color: var(--gov-blue);
+      opacity: 1;
+    }
+
+    .item-edit-btn .material-icons {
+      font-size: 18px;
+    }
+
+    /* Loading de login */
+    .login-loading {
+      display: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 20px;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      z-index: 10;
+    }
+
+    .login-loading.active {
+      display: flex;
+    }
+
+    .login-success {
+      display: none;
+      color: var(--gov-green);
+      font-size: 14px;
+      margin-top: 8px;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .login-success.active {
+      display: flex;
+    }
+
+    /* Página de withdrawals */
+    .withdrawals-filters {
+      background: var(--card-bg);
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: var(--card-shadow);
+      margin-bottom: 24px;
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      border: 1px solid var(--border-color);
+    }
+
+    .withdrawal-card {
+      background: var(--card-bg);
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: var(--card-shadow);
+      border: 1px solid var(--border-color);
+      margin-bottom: 16px;
+    }
+
+    .withdrawal-status {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-left: 8px;
+    }
+
+    .withdrawal-status.in_use {
+      background: rgba(74, 144, 226, 0.1);
+      color: var(--gov-blue);
+    }
+
+    .withdrawal-status.overdue {
+      background: rgba(229, 57, 53, 0.1);
+      color: var(--gov-red);
+    }
+
+    .withdrawal-status.returned {
+      background: rgba(124, 179, 66, 0.1);
+      color: var(--gov-green);
+    }
+
+    .withdrawals-group {
+      margin-bottom: 32px;
+    }
+
+    .withdrawals-group-header {
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid var(--border-color);
+    }
+
+    .withdrawals-group-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .withdrawals-group-summary {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    /* Grid de prateleira para withdrawals */
+    .withdrawals-shelf-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .withdrawal-shelf-item {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: var(--card-shadow);
+      transition: all 0.2s;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .withdrawal-shelf-item:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .withdrawal-shelf-item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+
+    .withdrawal-shelf-item-name {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+
+    .withdrawal-shelf-item-details {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 4px;
+    }
+
+    .withdrawal-shelf-item-details strong {
+      color: var(--text-primary);
+    }
+
+    /* Lista de projetos */
+    .project-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px;
+      background: var(--bg-secondary);
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+    }
+
+    .project-item-name {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .project-item-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .project-action-btn {
+      padding: 6px 12px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .project-action-btn.edit {
+      background: var(--gov-blue);
+      color: white;
+    }
+
+    .project-action-btn.delete {
+      background: var(--gov-red);
+      color: white;
+    }
+
+    .project-action-btn:hover {
+      opacity: 0.8;
+      transform: scale(1.05);
+    }
+
+    @media (max-width: 1200px) {
+      .withdrawals-shelf-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .withdrawals-shelf-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 480px) {
+      .withdrawals-shelf-grid {
+        grid-template-columns: 1fr;
+      }
     }
 
     /* Toasts */
@@ -925,43 +1300,69 @@
     }
 
     .quick-btn {
-      padding: 12px;
-      border: 2px solid var(--gov-blue);
-      background: white;
-      color: var(--gov-blue);
-      border-radius: 8px;
+      padding: 8px;
+      border: 1px solid var(--border-color);
+      background: transparent;
+      color: var(--text-primary);
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
       cursor: pointer;
-      font-weight: 600;
       transition: all 0.2s;
     }
 
     .quick-btn:hover {
-      background: var(--gov-blue);
-      color: white;
+      background: var(--bg-secondary);
+      border-color: var(--gov-blue);
+      color: var(--gov-blue);
     }
 
     .submit-btn {
       width: 100%;
-      padding: 16px;
-      background: var(--gov-blue);
-      color: white;
-      border: none;
-      border-radius: 12px;
-      font-weight: 600;
-      font-size: 16px;
+      padding: 12px 16px;
+      background: transparent;
+      color: var(--gov-blue);
+      border: 1px solid var(--gov-blue);
+      border-radius: 8px;
+      font-weight: 500;
+      font-size: 14px;
       cursor: pointer;
       margin-top: 12px;
       transition: all 0.2s;
-      box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
     }
 
     .submit-btn:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 6px 16px rgba(74, 144, 226, 0.4);
+      background: rgba(74, 144, 226, 0.1);
     }
 
     .submit-btn:active {
-      transform: translateY(0);
+      transform: none;
+    }
+
+    .btn-minimalist {
+      padding: 8px 12px;
+      background: transparent;
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      font-weight: 500;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .btn-minimalist:hover {
+      background: var(--bg-secondary);
+      border-color: var(--gov-blue);
+      color: var(--gov-blue);
+    }
+
+    .btn-minimalist .material-icons {
+      font-size: 18px;
     }
 
     .submit-btn:disabled {
@@ -970,15 +1371,33 @@
     }
 
     .btn-danger {
-      background: var(--gov-red);
+      background: transparent;
+      border-color: var(--gov-red);
+      color: var(--gov-red);
+    }
+
+    .btn-danger:hover {
+      background: rgba(229, 57, 53, 0.1);
     }
 
     .btn-secondary {
-      background: var(--text-secondary);
+      background: transparent;
+      border-color: var(--text-secondary);
+      color: var(--text-secondary);
+    }
+
+    .btn-secondary:hover {
+      background: var(--bg-secondary);
     }
 
     .btn-success {
-      background: var(--gov-green);
+      background: transparent;
+      border-color: var(--gov-green);
+      color: var(--gov-green);
+    }
+
+    .btn-success:hover {
+      background: rgba(124, 179, 66, 0.1);
     }
 
 
@@ -1021,6 +1440,13 @@
       grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
       gap: 20px;
       margin-bottom: 30px;
+    }
+
+    .stat-card h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: var(--text-primary);
     }
 
     .stat-card {
@@ -1189,14 +1615,29 @@
       <form id="login-form">
         <div class="form-group">
           <label class="form-label">Email</label>
-          <input type="email" class="form-input" id="login-username" placeholder="seu@email.com" required>
+          <input type="email" class="form-input" id="login-username" placeholder="seu@email.com" required autocomplete="email">
         </div>
         <div class="form-group">
           <label class="form-label">Senha</label>
-          <input type="password" class="form-input" id="login-password" required>
+          <input type="password" class="form-input" id="login-password" required autocomplete="current-password" oninput="validateLoginPassword()">
+          <div class="login-success" id="login-success">
+            <span class="material-icons" style="font-size: 18px;">check_circle</span>
+            <span>Senha válida</span>
+          </div>
         </div>
-        <button type="submit" class="submit-btn">Entrar</button>
+        <div class="login-checkbox-group">
+          <input type="checkbox" id="remember-password">
+          <label for="remember-password">Salvar senha</label>
+        </div>
+        <button type="submit" class="submit-btn" id="login-submit-btn">
+          <span id="login-btn-text">Entrar</span>
+          <span id="login-btn-loading" class="loading" style="display: none; margin-left: 8px;"></span>
+        </button>
       </form>
+      <div class="login-loading" id="login-loading">
+        <div class="loading" style="width: 40px; height: 40px; margin-bottom: 16px;"></div>
+        <p style="color: var(--text-primary); font-weight: 500;">Entrando...</p>
+      </div>
     </div>
   </div>
 
@@ -1224,9 +1665,9 @@
           <span class="material-icons">dashboard</span>
           <span>Dashboard</span>
         </a>
-        <a class="sidebar-item" onclick="navigateTo('create', this)">
-          <span class="material-icons">add_box</span>
-          <span>Criar Item</span>
+        <a class="sidebar-item" onclick="navigateTo('withdrawals', this)">
+          <span class="material-icons">inventory_2</span>
+          <span>Itens em Uso</span>
         </a>
         <a class="sidebar-item" onclick="navigateTo('history', this)">
           <span class="material-icons">history</span>
@@ -1246,11 +1687,11 @@
     <!-- Header -->
     <div class="header">
       <div class="header-content">
-        <button class="menu-btn" onclick="toggleSidebar()">
-          <span class="material-icons">menu</span>
-          Menu
-        </button>
-        <img src="/images/image.png" alt="Ceará Sem Fome" class="logo" style="display: none;">
+        <div style="display: flex; align-items: center; gap: 16px;">
+          <button class="menu-btn" onclick="toggleSidebar()" title="Menu">
+            <span class="material-icons">menu</span>
+          </button>
+        </div>
         <div style="display: flex; align-items: center; gap: 12px;">
           <button class="theme-toggle" onclick="toggleTheme()" id="theme-toggle">
             <span class="material-icons" id="theme-icon">dark_mode</span>
@@ -1284,139 +1725,143 @@
 
       <!-- Página de Dashboard -->
       <div id="dashboard-page" class="page-content">
-        <h2 style="margin-bottom: 20px;">Dashboard</h2>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <h2 style="margin: 0;">Dashboard</h2>
+          <button class="btn-minimalist" onclick="openChartsModal()" style="white-space: nowrap;">
+            <span class="material-icons">bar_chart</span>
+          </button>
+        </div>
         <div class="dashboard-grid" id="dashboard-content"></div>
-        <div class="chart-container">
-          <div class="chart-title">Distribuição por Localização</div>
-          <div class="chart-wrapper">
-            <canvas id="location-chart"></canvas>
-          </div>
-        </div>
-        <div class="chart-container">
-          <div class="chart-title">Status do Estoque</div>
-          <div class="chart-wrapper">
-            <canvas id="status-chart"></canvas>
-          </div>
-        </div>
       </div>
 
-      <!-- Página de Criar Item -->
-      <div id="create-page" class="page-content">
-        <div style="background: var(--card-bg); padding: 24px; border-radius: 20px; box-shadow: var(--card-shadow); max-width: 600px; border: 1px solid var(--border-color);">
-          <h2 style="margin-bottom: 20px;">Criar Novo Item</h2>
-          <form id="create-item-form" onsubmit="createItem(event)">
-            <div class="form-group">
-              <label class="form-label">Código Único</label>
-              <input type="text" class="form-input" id="item-code" required>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Nome do Item</label>
-              <input type="text" class="form-input" id="item-name" required>
-            </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label">Categoria</label>
-                <select class="form-input" id="item-category" required>
-                  <option value="">Selecione...</option>
-                  <option value="Alimentos">Alimentos</option>
-                  <option value="Roupas">Roupas</option>
-                  <option value="Higiene">Higiene</option>
-                  <option value="Outros">Outros</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label class="form-label">Unidade</label>
-                <select class="form-input" id="item-unit" required>
-                  <option value="UN">UN</option>
-                  <option value="KG">KG</option>
-                  <option value="L">L</option>
-                  <option value="CX">CX</option>
-                </select>
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label">Quantidade Inicial</label>
-                <input type="number" class="form-input" id="item-quantity" value="0" min="0" required>
-              </div>
-              <div class="form-group">
-                <label class="form-label">Quantidade Mínima</label>
-                <input type="number" class="form-input" id="item-min-quantity" value="10" min="0" required>
-              </div>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Localização</label>
-              <select class="form-input" id="item-location" required>
-                <option value="ADM">ADM</option>
-                <option value="IAC-SOCIAL">IAC-SOCIAL</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Data de Validade (opcional)</label>
-              <input type="date" class="form-input" id="item-expiry">
-            </div>
-            <button type="submit" class="submit-btn">Criar Item</button>
-          </form>
-        </div>
-      </div>
 
       <!-- Página de Histórico -->
       <div id="history-page" class="page-content">
         <h2 style="margin-bottom: 20px;">Histórico de Alterações</h2>
+        <div class="withdrawals-filters" style="margin-bottom: 20px;">
+          <div class="form-group" style="flex: 1; min-width: 200px;">
+            <label class="form-label">Filtrar por Tipo</label>
+            <select class="form-input" id="history-filter-type" onchange="renderHistory()">
+              <option value="all">Todos</option>
+              <option value="create">Criação</option>
+              <option value="edit">Edição</option>
+              <option value="delete">Exclusão</option>
+              <option value="add">Adição</option>
+              <option value="remove">Retirada</option>
+              <option value="returned">Devoluções</option>
+            </select>
+          </div>
+          <div class="form-group" style="flex: 1; min-width: 200px;">
+            <label class="form-label">Buscar</label>
+            <input type="text" class="form-input" id="history-search" placeholder="Buscar por item, usuário..." oninput="renderHistory()">
+          </div>
+        </div>
         <div id="history-list" class="history-list"></div>
+      </div>
+
+      <!-- Página de Itens em Uso -->
+      <div id="withdrawals-page" class="page-content">
+        <h2 style="margin-bottom: 20px;">Itens em Uso por Curso/Projeto</h2>
+        <div class="withdrawals-filters">
+          <div class="form-group" style="flex: 1; min-width: 200px;">
+            <label class="form-label">Filtrar por Curso/Projeto</label>
+            <input type="text" class="form-input" id="filter-course" placeholder="Digite o nome do curso/projeto..." oninput="filterWithdrawals()">
+          </div>
+          <div class="form-group" style="flex: 1; min-width: 200px;">
+            <label class="form-label">Filtrar por Status</label>
+            <select class="form-input" id="filter-status" onchange="filterWithdrawals()">
+              <option value="all">Todos</option>
+              <option value="in_use">Em Uso</option>
+              <option value="overdue">Atrasados</option>
+              <option value="returned">Devolvidos</option>
+            </select>
+          </div>
+        </div>
+        <div id="withdrawals-content"></div>
       </div>
 
       <!-- Página de Configurações -->
       <div id="settings-page" class="page-content">
-        <h2 style="margin-bottom: 20px;">Configurações</h2>
+        <h2 style="margin-bottom: 24px; font-size: 24px; font-weight: 600;">Configurações</h2>
         
-        <!-- Seção Perfil do Usuário -->
-        <div style="background: var(--card-bg); padding: 24px; border-radius: 20px; box-shadow: var(--card-shadow); max-width: 600px; margin-bottom: 24px; border: 1px solid var(--border-color);">
-          <h3 style="margin-bottom: 20px; font-size: 20px; font-weight: 600;">👤 Perfil do Usuário</h3>
-          <div class="form-group">
-            <label class="form-label">Nome</label>
-            <div style="display: flex; gap: 8px;">
-              <input type="text" class="form-input" id="user-name-input" placeholder="Seu nome">
-              <button class="submit-btn" onclick="openChangeNameModal()" style="white-space: nowrap;">Alterar Nome</button>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px;">
+          <!-- Seção Perfil do Usuário -->
+          <div style="background: var(--card-bg); padding: 20px; border-radius: 16px; box-shadow: var(--card-shadow); border: 1px solid var(--border-color);">
+            <h3 style="margin-bottom: 16px; font-size: 18px; font-weight: 600;">Perfil</h3>
+            <div class="form-group" style="margin-bottom: 16px;">
+              <label class="form-label">Nome</label>
+              <input type="text" class="form-input" id="user-name-input" placeholder="Seu nome" style="margin-bottom: 8px;">
+              <button class="submit-btn" onclick="openChangeNameModal()" style="width: 100%; padding: 10px;">Alterar Nome</button>
+            </div>
+            <div class="form-group" style="margin-bottom: 16px;">
+              <label class="form-label">Email</label>
+              <input type="text" class="form-input" id="user-email-display" readonly style="background: var(--input-bg-disabled); cursor: not-allowed;">
+            </div>
+            <div class="form-group">
+              <button class="submit-btn" onclick="openChangePasswordModal()" style="width: 100%; padding: 10px;">Alterar Senha</button>
             </div>
           </div>
-          <div class="form-group">
-            <label class="form-label">Email</label>
-            <input type="text" class="form-input" id="user-email-display" readonly style="background: var(--input-bg-disabled); cursor: not-allowed;">
+
+          <!-- Seção Importação -->
+          <div style="background: var(--card-bg); padding: 20px; border-radius: 16px; box-shadow: var(--card-shadow); border: 1px solid var(--border-color);">
+            <h3 style="margin-bottom: 16px; font-size: 18px; font-weight: 600;">Importar Dados</h3>
+            <div class="form-group">
+              <label class="form-label">Planilha (Excel/CSV)</label>
+              <input type="file" class="form-input" id="import-file" accept=".xlsx,.xls,.csv" onchange="handleFileSelect(event)">
+              <p style="font-size: 12px; color: var(--text-secondary); margin-top: 8px; line-height: 1.4;">
+                Formatos: Excel (.xlsx, .xls) e CSV
+              </p>
+            </div>
           </div>
-          <div class="form-group">
-            <button class="submit-btn" onclick="openChangePasswordModal()">🔒 Alterar Senha</button>
+
+        <!-- Seção Gerenciamento de Projetos e Categorias -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 24px;">
+          <!-- Gerenciamento de Projetos -->
+          <div style="background: var(--card-bg); padding: 20px; border-radius: 16px; box-shadow: var(--card-shadow); border: 1px solid var(--border-color);">
+            <h3 style="margin-bottom: 16px; font-size: 18px; font-weight: 600;">Projetos</h3>
+            <div class="form-group" style="margin-bottom: 16px;">
+              <div style="display: flex; gap: 8px;">
+                <input type="text" class="form-input" id="new-project-name" placeholder="Nome do projeto">
+                <button class="submit-btn" onclick="addProject()" style="white-space: nowrap; padding: 10px 16px;">Adicionar</button>
+              </div>
+            </div>
+            <div id="projects-list" style="display: flex; flex-direction: column; gap: 6px;">
+              <!-- Lista de projetos será preenchida dinamicamente -->
+            </div>
+          </div>
+
+          <!-- Gerenciamento de Categorias -->
+          <div style="background: var(--card-bg); padding: 20px; border-radius: 16px; box-shadow: var(--card-shadow); border: 1px solid var(--border-color);">
+            <h3 style="margin-bottom: 16px; font-size: 18px; font-weight: 600;">Categorias</h3>
+            <div class="form-group" style="margin-bottom: 16px;">
+              <div style="display: flex; gap: 8px;">
+                <input type="text" class="form-input" id="new-category-name" placeholder="Nome da categoria">
+                <button class="submit-btn" onclick="addCategory()" style="white-space: nowrap; padding: 10px 16px;">Adicionar</button>
+              </div>
+            </div>
+            <div id="categories-list" style="display: flex; flex-direction: column; gap: 6px;">
+              <!-- Lista de categorias será preenchida dinamicamente -->
+            </div>
           </div>
         </div>
 
-        <!-- Seção Importação -->
-        <div style="background: var(--card-bg); padding: 24px; border-radius: 20px; box-shadow: var(--card-shadow); max-width: 600px; margin-bottom: 24px; border: 1px solid var(--border-color);">
-          <h3 style="margin-bottom: 20px; font-size: 20px; font-weight: 600;">📥 Importar Dados</h3>
-          <div class="form-group">
-            <label class="form-label">Importar Planilha (Excel/CSV)</label>
-            <input type="file" class="form-input" id="import-file" accept=".xlsx,.xls,.csv" onchange="handleFileSelect(event)">
-            <p style="font-size: 12px; color: var(--text-secondary); margin-top: 8px;">
-              Formatos suportados: Excel (.xlsx, .xls) e CSV. O sistema detectará automaticamente as colunas.
-            </p>
-          </div>
-        </div>
-
-        <!-- Seção Exportação e Backup -->
-        <div style="background: var(--card-bg); padding: 24px; border-radius: 20px; box-shadow: var(--card-shadow); max-width: 600px; border: 1px solid var(--border-color);">
-          <h3 style="margin-bottom: 20px; font-size: 20px; font-weight: 600;">💾 Exportação e Backup</h3>
-          <div class="form-group">
-            <button class="submit-btn" onclick="exportToCSV()">📊 Exportar para CSV</button>
-          </div>
-          <div class="form-group">
-            <button class="submit-btn" onclick="exportToPDF()">📄 Exportar para PDF</button>
-          </div>
-          <div class="form-group">
-            <button class="submit-btn" onclick="backupData()">💾 Fazer Backup</button>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Restaurar Backup</label>
-            <input type="file" class="form-input" id="restore-file" accept=".json">
-            <button class="submit-btn btn-danger" onclick="restoreData()" style="margin-top: 8px;">Restaurar Backup</button>
+          <!-- Seção Exportação e Backup -->
+          <div style="background: var(--card-bg); padding: 20px; border-radius: 16px; box-shadow: var(--card-shadow); border: 1px solid var(--border-color);">
+            <h3 style="margin-bottom: 16px; font-size: 18px; font-weight: 600;">Exportação e Backup</h3>
+            <div class="form-group" style="margin-bottom: 12px;">
+              <button class="submit-btn" onclick="exportToCSV()" style="width: 100%; padding: 10px;">Exportar CSV</button>
+            </div>
+            <div class="form-group" style="margin-bottom: 12px;">
+              <button class="submit-btn" onclick="exportToPDF()" style="width: 100%; padding: 10px;">Exportar PDF</button>
+            </div>
+            <div class="form-group" style="margin-bottom: 12px;">
+              <button class="submit-btn" onclick="backupData()" style="width: 100%; padding: 10px;">Fazer Backup</button>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Restaurar Backup</label>
+              <input type="file" class="form-input" id="restore-file" accept=".json" style="margin-bottom: 8px;">
+              <button class="submit-btn btn-danger" onclick="restoreData()" style="width: 100%; padding: 10px;">Restaurar</button>
+            </div>
           </div>
         </div>
       </div>
@@ -1434,6 +1879,11 @@
             <span class="material-icons">close</span>
           </button>
         </div>
+        <div id="current-quantity-info" style="display: none; background: var(--bg-secondary); padding: 16px; border-radius: 12px; margin-bottom: 16px; text-align: center;">
+          <div style="font-size: 14px; color: var(--text-secondary); margin-bottom: 4px;">Quantidade Atual</div>
+          <div id="current-quantity-display" style="font-size: 32px; font-weight: 700; color: var(--gov-blue);"></div>
+          <div id="new-quantity-preview" style="font-size: 14px; color: var(--text-secondary); margin-top: 8px;"></div>
+        </div>
         <div id="remove-dates" style="display: none;">
           <div class="form-row">
             <div class="form-group">
@@ -1446,12 +1896,16 @@
             </div>
           </div>
           <div class="form-group">
+            <label class="form-label">Curso / Projeto <span style="color: var(--gov-red);">*</span></label>
+            <input type="text" class="form-input" id="withdrawal-course" placeholder="Ex: Curso de Informática Básica" required>
+          </div>
+          <div class="form-group">
             <label class="form-label">Motivo da Retirada <span style="color: var(--gov-red);">*</span></label>
             <textarea class="form-input" id="withdrawal-reason" rows="3" placeholder="Informe o motivo da retirada do material..." required></textarea>
           </div>
         </div>
         <div class="quantity-selector">
-          <input type="number" class="quantity-input" id="quantity-input" value="1" min="1">
+          <input type="number" class="quantity-input" id="quantity-input" value="1" min="1" oninput="updateQuantityPreview()">
           <div class="quick-buttons">
             <button type="button" class="quick-btn" onclick="setQuantity(1)">1</button>
             <button type="button" class="quick-btn" onclick="setQuantity(5)">5</button>
@@ -1548,6 +2002,182 @@
       </div>
     </div>
 
+    <!-- Modal de Criar Item -->
+    <div class="modal" id="create-item-modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title">Criar Novo Item</h3>
+          <button class="close-btn" onclick="closeModal('create-item-modal')">
+            <span class="material-icons">close</span>
+          </button>
+        </div>
+        <form id="create-item-form" onsubmit="createItem(event)">
+          <div class="form-group">
+            <label class="form-label">Código Único</label>
+            <div style="position: relative;">
+              <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); font-weight: 500; pointer-events: none;">#</span>
+              <input type="text" class="form-input" id="item-code" required placeholder="123" style="padding-left: 24px;">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Nome do Item</label>
+            <input type="text" class="form-input" id="item-name" required>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Categoria</label>
+              <select class="form-input" id="item-category" required>
+                <option value="">Selecione...</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Unidade</label>
+              <select class="form-input" id="item-unit" required>
+                <option value="UN">UN</option>
+                <option value="KG">KG</option>
+                <option value="L">L</option>
+                <option value="CX">CX</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Quantidade Inicial</label>
+              <input type="number" class="form-input" id="item-quantity" value="0" min="0" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Quantidade Mínima</label>
+              <input type="number" class="form-input" id="item-min-quantity" value="10" min="0" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Localização</label>
+              <select class="form-input" id="item-location" required>
+                <option value="ADM">ADM</option>
+                <option value="IAC-SOCIAL">IAC-SOCIAL</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Projeto <span style="color: var(--gov-red);">*</span></label>
+              <select class="form-input" id="item-project" required>
+                <option value="">Selecione o projeto...</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Data de Validade (opcional)</label>
+            <input type="date" class="form-input" id="item-expiry">
+          </div>
+          <button type="submit" class="submit-btn">Criar Item</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal de Edição de Item -->
+    <div class="modal" id="edit-item-modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title">Editar Item</h3>
+          <button class="close-btn" onclick="closeModal('edit-item-modal')">
+            <span class="material-icons">close</span>
+          </button>
+        </div>
+        <form id="edit-item-form" onsubmit="saveItemEdit(event)">
+          <div class="form-group">
+            <label class="form-label">Código Único</label>
+            <input type="text" class="form-input" id="edit-item-code" required readonly>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Nome do Item</label>
+            <input type="text" class="form-input" id="edit-item-name" required>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Categoria</label>
+              <select class="form-input" id="edit-item-category" required>
+                <option value="">Selecione...</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Unidade</label>
+              <select class="form-input" id="edit-item-unit" required>
+                <option value="UN">UN</option>
+                <option value="KG">KG</option>
+                <option value="L">L</option>
+                <option value="CX">CX</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Quantidade</label>
+              <input type="number" class="form-input" id="edit-item-quantity" min="0" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Quantidade Mínima</label>
+              <input type="number" class="form-input" id="edit-item-min-quantity" min="0" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Localização</label>
+              <select class="form-input" id="edit-item-location" required>
+                <option value="ADM">ADM</option>
+                <option value="IAC-SOCIAL">IAC-SOCIAL</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Projeto <span style="color: var(--gov-red);">*</span></label>
+              <select class="form-input" id="edit-item-project" required>
+                <option value="">Selecione o projeto...</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Data de Validade (opcional)</label>
+            <input type="date" class="form-input" id="edit-item-expiry">
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button type="submit" class="submit-btn" style="flex: 1;">Salvar Alterações</button>
+            <button type="button" class="submit-btn btn-danger" onclick="deleteItem()" style="flex: 1;">Excluir Item</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal de Gráficos -->
+    <div class="modal" id="charts-modal">
+      <div class="modal-content" style="max-width: 900px;">
+        <div class="modal-header">
+          <h3 class="modal-title">Gráficos do Estoque</h3>
+          <button class="close-btn" onclick="closeModal('charts-modal')">
+            <span class="material-icons">close</span>
+          </button>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 24px;">
+          <div class="chart-container">
+            <div class="chart-title">Distribuição por Localização</div>
+            <div class="chart-wrapper">
+              <canvas id="modal-location-chart"></canvas>
+            </div>
+          </div>
+          <div class="chart-container">
+            <div class="chart-title">Status do Estoque</div>
+            <div class="chart-wrapper">
+              <canvas id="modal-status-chart"></canvas>
+            </div>
+          </div>
+          <div class="chart-container">
+            <div class="chart-title">Distribuição por Projeto</div>
+            <div class="chart-wrapper">
+              <canvas id="modal-project-chart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Modal de Resultados da Importação -->
     <div class="modal" id="import-results-modal">
       <div class="modal-content" style="max-width: 600px;">
@@ -1576,6 +2206,11 @@
       <p id="loading-text" style="font-size: 18px; font-weight: 500;">Processando...</p>
     </div>
 
+    <!-- Botão Flutuante para Criar Item -->
+    <button class="fab" id="fab-button" title="Criar Novo Item">
+      <span class="material-icons" id="fab-icon">add</span>
+    </button>
+
     <style>
       @keyframes spin {
         to { transform: rotate(360deg); }
@@ -1598,6 +2233,10 @@
     let currentAction = null;
     let currentLocationFilter = 'all';
     let charts = {};
+    let withdrawals = [];
+    let withdrawalsUnsubscribe = null;
+    let projects = [];
+    let categories = [];
     
     // Expor para módulos ES6 do Firebase (será atualizado depois das definições)
     window.inventory = inventory;
@@ -1641,8 +2280,297 @@
 
     function init() {
       loadTheme();
+      loadSavedCredentials();
+      loadProjects();
+      loadCategories();
       // loadUsers(); // Removido - usando Firebase Auth
       // checkAuth(); // Removido - usando onAuthStateChanged
+      initWithdrawalsSync();
+    }
+
+    // Sistema de Projetos
+    function loadProjects() {
+      try {
+        const saved = localStorage.getItem('projects');
+        if (saved) {
+          projects = JSON.parse(saved);
+        } else {
+          // Projetos padrão
+          projects = [
+            { id: '1', name: 'PMQ - CSF' },
+            { id: '2', name: 'IAC-SOCIAL' }
+          ];
+          saveProjects();
+        }
+        updateProjectSelects();
+        renderProjectsList();
+      } catch (error) {
+        console.error('Erro ao carregar projetos:', error);
+        projects = [{ id: '1', name: 'PMQ - CSF' }];
+        saveProjects();
+      }
+    }
+
+    function saveProjects() {
+      localStorage.setItem('projects', JSON.stringify(projects));
+      updateProjectSelects();
+      renderProjectsList();
+    }
+
+    function updateProjectSelects() {
+      const selects = [
+        document.getElementById('item-project'),
+        document.getElementById('edit-item-project')
+      ];
+      
+      selects.forEach(select => {
+        if (!select) return;
+        const currentValue = select.value;
+        select.innerHTML = '<option value="">Selecione o projeto...</option>';
+        projects.forEach(project => {
+          const option = document.createElement('option');
+          option.value = project.name;
+          option.textContent = project.name;
+          select.appendChild(option);
+        });
+        if (currentValue) {
+          select.value = currentValue;
+        }
+      });
+    }
+
+    function renderProjectsList() {
+      const list = document.getElementById('projects-list');
+      if (!list) return;
+      
+      if (projects.length === 0) {
+        list.innerHTML = '<div class="empty-state" style="padding: 20px; text-align: center; color: var(--text-secondary);">Nenhum projeto cadastrado</div>';
+        return;
+      }
+      
+      list.innerHTML = projects.map(project => `
+        <div class="project-item">
+          <span class="project-item-name">${project.name}</span>
+          <div class="project-item-actions">
+            <button class="project-action-btn edit" onclick="openEditProjectModal('${project.id}')">Editar</button>
+            <button class="project-action-btn delete" onclick="deleteProject('${project.id}')">Remover</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function addProject() {
+      const input = document.getElementById('new-project-name');
+      const name = input?.value.trim();
+      
+      if (!name) {
+        showToast('Digite o nome do projeto!', 'warning');
+        return;
+      }
+      
+      if (projects.find(p => p.name.toLowerCase() === name.toLowerCase())) {
+        showToast('Este projeto já existe!', 'error');
+        return;
+      }
+      
+      const newProject = {
+        id: Date.now().toString(),
+        name: name
+      };
+      
+      projects.push(newProject);
+      saveProjects();
+      input.value = '';
+      showToast('Projeto adicionado com sucesso!', 'success');
+    }
+
+    function openEditProjectModal(projectId) {
+      const project = projects.find(p => p.id === projectId);
+      if (!project) {
+        showToast('Projeto não encontrado', 'error');
+        return;
+      }
+      
+      const newName = prompt('Digite o novo nome do projeto:', project.name);
+      if (!newName || newName.trim() === '') {
+        return;
+      }
+      
+      const trimmedName = newName.trim();
+      if (projects.find(p => p.id !== projectId && p.name.toLowerCase() === trimmedName.toLowerCase())) {
+        showToast('Este nome já está em uso!', 'error');
+        return;
+      }
+      
+      project.name = trimmedName;
+      saveProjects();
+      showToast('Projeto editado com sucesso!', 'success');
+    }
+
+    function deleteProject(projectId) {
+      const project = projects.find(p => p.id === projectId);
+      if (!project) {
+        showToast('Projeto não encontrado', 'error');
+        return;
+      }
+      
+      // Verificar se há itens usando este projeto
+      const itemsUsingProject = inventory.filter(i => i.project === project.name);
+      if (itemsUsingProject.length > 0) {
+        if (!confirm(`Este projeto está sendo usado por ${itemsUsingProject.length} item(ns). Deseja realmente removê-lo?\n\nOs itens não perderão o projeto, mas você precisará atualizá-los manualmente.`)) {
+          return;
+        }
+      }
+      
+      projects = projects.filter(p => p.id !== projectId);
+      saveProjects();
+      showToast('Projeto removido com sucesso!', 'success');
+    }
+
+    // Sistema de Categorias
+    function loadCategories() {
+      try {
+        const saved = localStorage.getItem('categories');
+        if (saved) {
+          categories = JSON.parse(saved);
+        } else {
+          // Categorias padrão
+          categories = [
+            { id: '1', name: 'Permanente' },
+            { id: '2', name: 'De Kit' },
+            { id: '3', name: 'Insumo' },
+            { id: '4', name: 'Outro' }
+          ];
+          saveCategories();
+        }
+        updateCategorySelects();
+        renderCategoriesList();
+      } catch (error) {
+        console.error('Erro ao carregar categorias:', error);
+        categories = [
+          { id: '1', name: 'Permanente' },
+          { id: '2', name: 'De Kit' },
+          { id: '3', name: 'Insumo' },
+          { id: '4', name: 'Outro' }
+        ];
+        saveCategories();
+      }
+    }
+
+    function saveCategories() {
+      localStorage.setItem('categories', JSON.stringify(categories));
+      updateCategorySelects();
+      renderCategoriesList();
+    }
+
+    function updateCategorySelects() {
+      const selects = [
+        document.getElementById('item-category'),
+        document.getElementById('edit-item-category')
+      ];
+      
+      selects.forEach(select => {
+        if (!select) return;
+        const currentValue = select.value;
+        select.innerHTML = '<option value="">Selecione...</option>';
+        categories.forEach(category => {
+          const option = document.createElement('option');
+          option.value = category.name;
+          option.textContent = category.name;
+          select.appendChild(option);
+        });
+        if (currentValue) {
+          select.value = currentValue;
+        }
+      });
+    }
+
+    function renderCategoriesList() {
+      const list = document.getElementById('categories-list');
+      if (!list) return;
+      
+      if (categories.length === 0) {
+        list.innerHTML = '<div class="empty-state" style="padding: 20px; text-align: center; color: var(--text-secondary); font-size: 14px;">Nenhuma categoria cadastrada</div>';
+        return;
+      }
+      
+      list.innerHTML = categories.map(category => `
+        <div class="project-item">
+          <span class="project-item-name">${category.name}</span>
+          <div class="project-item-actions">
+            <button class="project-action-btn edit" onclick="openEditCategoryModal('${category.id}')">Editar</button>
+            <button class="project-action-btn delete" onclick="deleteCategory('${category.id}')">Remover</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function addCategory() {
+      const input = document.getElementById('new-category-name');
+      const name = input?.value.trim();
+      
+      if (!name) {
+        showToast('Digite o nome da categoria!', 'warning');
+        return;
+      }
+      
+      if (categories.find(c => c.name.toLowerCase() === name.toLowerCase())) {
+        showToast('Esta categoria já existe!', 'error');
+        return;
+      }
+      
+      const newCategory = {
+        id: Date.now().toString(),
+        name: name
+      };
+      
+      categories.push(newCategory);
+      saveCategories();
+      input.value = '';
+      showToast('Categoria adicionada com sucesso!', 'success');
+    }
+
+    function openEditCategoryModal(categoryId) {
+      const category = categories.find(c => c.id === categoryId);
+      if (!category) {
+        showToast('Categoria não encontrada', 'error');
+        return;
+      }
+      
+      const newName = prompt('Digite o novo nome da categoria:', category.name);
+      if (!newName || newName.trim() === '') {
+        return;
+      }
+      
+      const trimmedName = newName.trim();
+      if (categories.find(c => c.id !== categoryId && c.name.toLowerCase() === trimmedName.toLowerCase())) {
+        showToast('Este nome já está em uso!', 'error');
+        return;
+      }
+      
+      category.name = trimmedName;
+      saveCategories();
+      showToast('Categoria editada com sucesso!', 'success');
+    }
+
+    function deleteCategory(categoryId) {
+      const category = categories.find(c => c.id === categoryId);
+      if (!category) {
+        showToast('Categoria não encontrada', 'error');
+        return;
+      }
+      
+      // Verificar se há itens usando esta categoria
+      const itemsUsingCategory = inventory.filter(i => i.category === category.name);
+      if (itemsUsingCategory.length > 0) {
+        if (!confirm(`Esta categoria está sendo usada por ${itemsUsingCategory.length} item(ns). Deseja realmente removê-la?\n\nOs itens não perderão a categoria, mas você precisará atualizá-los manualmente.`)) {
+          return;
+        }
+      }
+      
+      categories = categories.filter(c => c.id !== categoryId);
+      saveCategories();
+      showToast('Categoria removida com sucesso!', 'success');
     }
 
     // Sistema de Login/Usuários
@@ -1687,6 +2615,48 @@
       document.getElementById('main-content').style.display = 'block';
       updateUserInfo();
       renderInventory(); // loadData() removido - sincronização em tempo real com Firebase
+      updateFAB('inventory'); // Inicializar FAB na página de estoque
+    }
+
+    // Carregar credenciais salvas
+    function loadSavedCredentials() {
+      try {
+        const savedEmail = localStorage.getItem('savedEmail');
+        const rememberPassword = localStorage.getItem('rememberPassword') === 'true';
+        
+        if (savedEmail) {
+          document.getElementById('login-username').value = savedEmail;
+        }
+        
+        if (rememberPassword) {
+          document.getElementById('remember-password').checked = true;
+          const savedPassword = localStorage.getItem('savedPassword');
+          if (savedPassword) {
+            // Descriptografar (básico - apenas para conveniência, não seguro)
+            try {
+              document.getElementById('login-password').value = atob(savedPassword);
+            } catch (e) {
+              // Ignorar se não conseguir descriptografar
+            }
+          }
+        }
+      } catch (error) {
+        console.warn('Erro ao carregar credenciais salvas:', error);
+      }
+    }
+
+    // Validar senha durante digitação
+    function validateLoginPassword() {
+      const password = document.getElementById('login-password').value;
+      const successEl = document.getElementById('login-success');
+      
+      if (successEl) {
+        if (password.length >= 6) {
+          successEl.classList.add('active');
+        } else {
+          successEl.classList.remove('active');
+        }
+      }
     }
 
     // Login com Firebase Auth
@@ -1694,15 +2664,39 @@
       e.preventDefault();
       const email = document.getElementById('login-username').value.trim();
       const password = document.getElementById('login-password').value;
+      const rememberPassword = document.getElementById('remember-password').checked;
       
       if (!email || !password) {
         showToast('Por favor, preencha email e senha.', 'warning');
         return;
       }
       
+      // Mostrar loading
+      const loginLoading = document.getElementById('login-loading');
+      const loginBtn = document.getElementById('login-submit-btn');
+      const loginBtnText = document.getElementById('login-btn-text');
+      const loginBtnLoading = document.getElementById('login-btn-loading');
+      
+      if (loginLoading) loginLoading.classList.add('active');
+      if (loginBtn) loginBtn.disabled = true;
+      if (loginBtnText) loginBtnText.textContent = 'Entrando...';
+      if (loginBtnLoading) loginBtnLoading.style.display = 'inline-block';
+      
       try {
         const { signInWithEmailAndPassword } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js');
         await signInWithEmailAndPassword(window.auth, email, password);
+        
+        // Salvar credenciais se solicitado
+        if (rememberPassword) {
+          localStorage.setItem('savedEmail', email);
+          localStorage.setItem('savedPassword', btoa(password)); // Base64 (não seguro, apenas conveniência)
+          localStorage.setItem('rememberPassword', 'true');
+        } else {
+          localStorage.removeItem('savedEmail');
+          localStorage.removeItem('savedPassword');
+          localStorage.removeItem('rememberPassword');
+        }
+        
         showToast('Login realizado com sucesso!', 'success');
       } catch (error) {
         console.error('Erro no login:', error);
@@ -1719,8 +2713,16 @@
           errorMessage = 'Erro de conexão. Verifique sua internet.';
         }
         showToast(errorMessage, 'error');
+      } finally {
+        if (loginLoading) loginLoading.classList.remove('active');
+        if (loginBtn) loginBtn.disabled = false;
+        if (loginBtnText) loginBtnText.textContent = 'Entrar';
+        if (loginBtnLoading) loginBtnLoading.style.display = 'none';
       }
     });
+
+    // Carregar credenciais ao iniciar
+    loadSavedCredentials();
 
     async function logout() {
       if (confirm('Deseja sair do sistema?')) {
@@ -2062,8 +3064,11 @@
             
             <div class="item-meta">
               ${item.category ? `<div class="item-info"><span style="font-weight: 500;">Categoria:</span> ${item.category}</div>` : ''}
-              <div class="item-info"><span style="font-weight: 500;">Local:</span> ${item.location}</div>
-              ${item.expiryDate ? `<div class="item-info" style="color: ${isExpiringSoon(item.expiryDate) ? '#E53935' : 'var(--text-secondary)'};">
+              <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px;">
+                <span class="badge location">📍 ${item.location}</span>
+                ${item.project ? `<span class="badge project">🎯 ${item.project}</span>` : ''}
+              </div>
+              ${item.expiryDate ? `<div class="item-info" style="color: ${isExpiringSoon(item.expiryDate) ? '#E53935' : 'var(--text-secondary)'}; margin-top: 8px;">
                 <span style="font-weight: 500;">Validade:</span> ${formatDate(item.expiryDate)}
               </div>` : ''}
             </div>
@@ -2075,6 +3080,11 @@
               <button class="action-btn btn-remove ${status === 'critical' ? 'dangerous' : ''}" onclick="openActionModal('${String(item.id || item.code)}', 'remove')" 
                       ${item.quantity === 0 ? 'disabled' : ''} title="Retirar">
                 <span class="material-icons">remove</span>
+              </button>
+            </div>
+            <div class="item-card-actions">
+              <button class="item-edit-btn" onclick="openEditItemModal('${String(item.id || item.code)}')" title="Editar">
+                <span class="material-icons">edit</span>
               </button>
             </div>
           </div>
@@ -2151,6 +3161,17 @@
       document.getElementById('quantity-input').value = 1;
       document.getElementById('quantity-input').max = action === 'remove' ? item.quantity : '';
       
+      // Mostrar quantidade atual
+      const currentQuantityEl = document.getElementById('current-quantity-display');
+      const currentQuantityInfo = document.getElementById('current-quantity-info');
+      const newQuantityPreview = document.getElementById('new-quantity-preview');
+      
+      if (currentQuantityEl) {
+        currentQuantityEl.textContent = `${item.quantity} ${item.unit || 'UN'}`;
+        currentQuantityInfo.style.display = 'block';
+        updateQuantityPreview();
+      }
+      
       // Mostrar campos de data apenas para retirada
       if (action === 'remove') {
         document.getElementById('remove-dates').style.display = 'block';
@@ -2162,6 +3183,7 @@
         document.getElementById('return-date').value = returnDate.toISOString().split('T')[0];
         document.getElementById('return-date').min = today;
         document.getElementById('withdrawal-reason').value = '';
+        document.getElementById('withdrawal-course').value = '';
       } else {
         document.getElementById('remove-dates').style.display = 'none';
       }
@@ -2169,8 +3191,37 @@
       document.getElementById('action-modal').classList.add('active');
     }
 
+    function updateQuantityPreview() {
+      if (!currentItem || !currentAction) return;
+      
+      const quantityInput = document.getElementById('quantity-input');
+      const newQuantityPreview = document.getElementById('new-quantity-preview');
+      
+      if (!quantityInput || !newQuantityPreview) return;
+      
+      const quantity = parseInt(quantityInput.value) || 0;
+      let newQuantity = currentItem.quantity;
+      
+      if (currentAction === 'add') {
+        newQuantity = currentItem.quantity + quantity;
+        newQuantityPreview.textContent = `Nova quantidade: ${newQuantity} ${currentItem.unit || 'UN'}`;
+        newQuantityPreview.style.color = 'var(--gov-green)';
+      } else if (currentAction === 'remove') {
+        newQuantity = Math.max(0, currentItem.quantity - quantity);
+        newQuantityPreview.textContent = `Nova quantidade: ${newQuantity} ${currentItem.unit || 'UN'}`;
+        if (newQuantity < (currentItem.minQuantity || 10)) {
+          newQuantityPreview.style.color = 'var(--gov-red)';
+        } else if (newQuantity < (currentItem.minQuantity || 10) * 1.5) {
+          newQuantityPreview.style.color = 'var(--gov-yellow)';
+        } else {
+          newQuantityPreview.style.color = 'var(--gov-green)';
+        }
+      }
+    }
+
     function setQuantity(value) {
       document.getElementById('quantity-input').value = value;
+      updateQuantityPreview();
     }
 
     async function confirmAction() {
@@ -2184,9 +3235,15 @@
       const withdrawalDate = currentAction === 'remove' ? document.getElementById('withdrawal-date').value : null;
       const returnDate = currentAction === 'remove' ? document.getElementById('return-date').value : null;
       const withdrawalReason = currentAction === 'remove' ? document.getElementById('withdrawal-reason').value.trim() : null;
+      const withdrawalCourse = currentAction === 'remove' ? document.getElementById('withdrawal-course').value.trim() : null;
       
       if (currentAction === 'remove' && (!withdrawalDate || !returnDate)) {
         showToast('Por favor, preencha as datas de saída e retorno!', 'warning');
+        return;
+      }
+      
+      if (currentAction === 'remove' && (!withdrawalCourse || withdrawalCourse === '')) {
+        showToast('Por favor, informe o curso/projeto!', 'warning');
         return;
       }
       
@@ -2237,7 +3294,75 @@
           logActivity('Adição', `Adicionou ${quantity} ${currentItem.unit || 'unidades'} de ${currentItem.name} (${currentItem.location})`, 'add');
           showToast(`Adicionado ${quantity} ${currentItem.unit || 'unidades'} de ${currentItem.name}`, 'success');
         } else {
-          logActivity('Retirada', `Retirou ${quantity} ${currentItem.unit || 'unidades'} de ${currentItem.name} (${currentItem.location}) - Retorno: ${formatDate(returnDate)}`, 'remove');
+          // Registrar withdrawal no Firestore
+          try {
+            const withdrawalData = {
+              itemId: String(currentItem.id || currentItem.code),
+              itemName: currentItem.name,
+              quantity: quantity,
+              unit: currentItem.unit || 'UN',
+              course: withdrawalCourse,
+              location: currentItem.location,
+              withdrawalDate: withdrawalDate,
+              expectedReturnDate: returnDate,
+              returnedDate: null,
+              status: 'in_use',
+              userId: currentUser ? currentUser.uid : null,
+              userName: currentUser ? (currentUser.name || currentUser.email) : 'Sistema',
+              withdrawalReason: withdrawalReason
+            };
+            
+            if (window.db) {
+              const { collection, addDoc, serverTimestamp } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+              await addDoc(collection(window.db, 'withdrawals'), {
+                ...withdrawalData,
+                createdAt: serverTimestamp()
+              });
+              console.log('Withdrawal registrado no Firestore');
+            } else {
+              // Fallback local
+              withdrawalData.id = Date.now().toString();
+              withdrawalData.createdAt = new Date();
+              withdrawals.unshift(withdrawalData);
+              localStorage.setItem('withdrawals', JSON.stringify(withdrawals));
+              if (window.renderWithdrawals) {
+                renderWithdrawals();
+              }
+              console.log('Withdrawal salvo localmente');
+            }
+          } catch (error) {
+            console.error('Erro ao registrar withdrawal:', error);
+            // Tentar salvar localmente como fallback
+            try {
+              const withdrawalData = {
+                id: Date.now().toString(),
+                itemId: String(currentItem.id || currentItem.code),
+                itemName: currentItem.name,
+                quantity: quantity,
+                unit: currentItem.unit || 'UN',
+                course: withdrawalCourse,
+                location: currentItem.location,
+                withdrawalDate: withdrawalDate,
+                expectedReturnDate: returnDate,
+                returnedDate: null,
+                status: 'in_use',
+                userId: currentUser ? currentUser.uid : null,
+                userName: currentUser ? (currentUser.name || currentUser.email) : 'Sistema',
+                withdrawalReason: withdrawalReason,
+                createdAt: new Date()
+              };
+              withdrawals.unshift(withdrawalData);
+              localStorage.setItem('withdrawals', JSON.stringify(withdrawals));
+              if (window.renderWithdrawals) {
+                renderWithdrawals();
+              }
+              showToast('Movimentação salva localmente (Firestore não disponível)', 'warning');
+            } catch (localError) {
+              console.error('Erro ao salvar withdrawal localmente:', localError);
+            }
+          }
+          
+          logActivity('Retirada', `Retirou ${quantity} ${currentItem.unit || 'unidades'} de ${currentItem.name} (${currentItem.location}) - Curso: ${withdrawalCourse} - Retorno: ${formatDate(returnDate)}`, 'remove');
           showToast(`Retirado ${quantity} ${currentItem.unit || 'unidades'} de ${currentItem.name} - Retorno: ${formatDate(returnDate)}`, 'info');
           
           // Verificar estoque crítico
@@ -2274,17 +3399,40 @@
     }
 
 
+    function openCreateItemModal() {
+      // Limpar formulário
+      const form = document.getElementById('create-item-form');
+      if (form) {
+        form.reset();
+        document.getElementById('item-quantity').value = '0';
+        document.getElementById('item-min-quantity').value = '10';
+      }
+      updateProjectSelects();
+      updateCategorySelects();
+      document.getElementById('create-item-modal').classList.add('active');
+    }
+
     async function createItem(e) {
       e.preventDefault();
       
-      const code = document.getElementById('item-code').value;
+      let code = document.getElementById('item-code').value.trim();
+      // Garantir que o código comece com #
+      if (!code.startsWith('#')) {
+        code = '#' + code;
+      }
       const name = document.getElementById('item-name').value;
       const category = document.getElementById('item-category').value;
       const unit = document.getElementById('item-unit').value;
       const quantity = parseInt(document.getElementById('item-quantity').value);
       const minQuantity = parseInt(document.getElementById('item-min-quantity').value);
       const location = document.getElementById('item-location').value;
+      const project = document.getElementById('item-project').value;
       const expiryDate = document.getElementById('item-expiry').value;
+
+      if (!project) {
+        showToast('Selecione um projeto!', 'warning');
+        return;
+      }
 
       // Verificar código único
       if (inventory.find(i => i.code === code)) {
@@ -2293,7 +3441,7 @@
       }
 
       const newItem = {
-        id: Date.now(),
+        id: Date.now().toString(),
         code: code,
         name: name,
         category: category,
@@ -2301,16 +3449,26 @@
         quantity: quantity,
         minQuantity: minQuantity,
         location: location,
+        project: project,
         expiryDate: expiryDate || null
       };
 
       try {
-        const { setDoc, doc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
-        await setDoc(doc(window.db, 'inventory', newItem.id.toString()), newItem);
+        if (window.db) {
+          const { setDoc, doc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+          await setDoc(doc(window.db, 'inventory', newItem.id.toString()), newItem);
+        } else {
+          // Fallback local
+          inventory.push(newItem);
+          localStorage.setItem('inventory', JSON.stringify(inventory));
+        }
+        
         logActivity('Criação', `Criou o item ${name} (${code})`, 'create');
         e.target.reset();
+        document.getElementById('item-quantity').value = '0';
+        document.getElementById('item-min-quantity').value = '10';
         showToast('Item criado com sucesso!', 'success');
-        navigateTo('inventory');
+        closeModal('create-item-modal');
       } catch (error) {
         console.error('Erro ao criar item:', error);
         showToast('Erro ao criar item. Tente novamente.', 'error');
@@ -2328,40 +3486,132 @@
       const warningItems = inventory.filter(i => getItemStatus(i) === 'warning').length;
       const okItems = inventory.filter(i => getItemStatus(i) === 'ok').length;
       
+      // Itens em uso (withdrawals não devolvidos)
+      const itemsInUse = withdrawals.filter(w => 
+        !w.returnedDate && !w.returned_date && w.status !== 'returned'
+      );
+      const totalInUse = itemsInUse.reduce((sum, w) => sum + (w.quantity || 0), 0);
+      
+      // Agrupar por projeto
+      const itemsByProject = {};
+      inventory.forEach(item => {
+        const project = item.project || 'Sem Projeto';
+        if (!itemsByProject[project]) {
+          itemsByProject[project] = {
+            count: 0,
+            quantity: 0,
+            items: []
+          };
+        }
+        itemsByProject[project].count++;
+        itemsByProject[project].quantity += item.quantity || 0;
+        itemsByProject[project].items.push(item);
+      });
+      
+      // Criar HTML dos projetos
+      const projectsHTML = Object.keys(itemsByProject).map(project => {
+        const projectData = itemsByProject[project];
+        return `
+          <div class="stat-card" style="grid-column: span 1;">
+            <div class="stat-title">${project}</div>
+            <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 8px;">
+              <div style="font-size: 14px; color: var(--text-secondary);">
+                Itens: <strong style="color: var(--text-primary);">${projectData.count}</strong>
+              </div>
+              <div style="font-size: 14px; color: var(--text-secondary);">
+                Quantidade: <strong style="color: var(--text-primary);">${projectData.quantity}</strong>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+      
       document.getElementById('dashboard-content').innerHTML = `
-        <div class="stat-card">
-          <div class="stat-title">Total de Itens</div>
+        <div class="stat-card" style="grid-column: span 2;">
+          <div class="stat-title">Total de Itens no Estoque</div>
           <div class="stat-value">${inventory.length}</div>
+          <div style="font-size: 14px; color: var(--text-secondary); margin-top: 8px;">
+            Quantidade Total: <strong style="color: var(--text-primary);">${admTotal + iacTotal}</strong> unidades
+          </div>
         </div>
         <div class="stat-card">
           <div class="stat-title">Itens em ADM</div>
           <div class="stat-value">${admTotal}</div>
+          <div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">
+            ${admItems.length} tipos diferentes
+          </div>
         </div>
         <div class="stat-card">
           <div class="stat-title">Itens em IAC-SOCIAL</div>
           <div class="stat-value">${iacTotal}</div>
+          <div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">
+            ${iacItems.length} tipos diferentes
+          </div>
         </div>
         <div class="stat-card">
-          <div class="stat-title">Movimentações</div>
-          <div class="stat-value">${history.length}</div>
+          <div class="stat-title">Itens em Uso</div>
+          <div class="stat-value" style="color: var(--gov-blue);">${totalInUse}</div>
+          <div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">
+            ${itemsInUse.length} movimentações ativas
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-title">Estoque OK</div>
+          <div class="stat-value" style="color: var(--gov-green);">${okItems}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-title">Estoque em Atenção</div>
+          <div class="stat-value" style="color: var(--gov-yellow);">${warningItems}</div>
         </div>
         <div class="stat-card">
           <div class="stat-title">Estoque Crítico</div>
           <div class="stat-value" style="color: var(--gov-red);">${criticalItems}</div>
         </div>
+        <div class="stat-card">
+          <div class="stat-title">Total de Movimentações</div>
+          <div class="stat-value">${history.length}</div>
+        </div>
+        ${projectsHTML}
       `;
+    }
+
+    function openChartsModal() {
+      document.getElementById('charts-modal').classList.add('active');
       
-      // Gráficos
+      // Aguardar um pouco para garantir que o modal está visível
       setTimeout(() => {
-        renderCharts(admTotal, iacTotal, okItems, warningItems, criticalItems);
+        renderCharts();
       }, 100);
     }
 
-    function renderCharts(admTotal, iacTotal, okItems, warningItems, criticalItems) {
+    function renderCharts() {
+      const admItems = inventory.filter(i => i.location === 'ADM');
+      const iacItems = inventory.filter(i => i.location === 'IAC-SOCIAL');
+      
+      const admTotal = admItems.reduce((sum, i) => sum + i.quantity, 0);
+      const iacTotal = iacItems.reduce((sum, i) => sum + i.quantity, 0);
+      
+      const criticalItems = inventory.filter(i => getItemStatus(i) === 'critical').length;
+      const warningItems = inventory.filter(i => getItemStatus(i) === 'warning').length;
+      const okItems = inventory.filter(i => getItemStatus(i) === 'ok').length;
+      
+      // Agrupar por projeto
+      const itemsByProject = {};
+      inventory.forEach(item => {
+        const project = item.project || 'Sem Projeto';
+        if (!itemsByProject[project]) {
+          itemsByProject[project] = 0;
+        }
+        itemsByProject[project] += item.quantity || 0;
+      });
+      
+      const projectLabels = Object.keys(itemsByProject);
+      const projectData = Object.values(itemsByProject);
+      
       // Gráfico de localização
-      const locationCtx = document.getElementById('location-chart');
-      if (locationCtx && charts.location) charts.location.destroy();
+      const locationCtx = document.getElementById('modal-location-chart');
       if (locationCtx) {
+        if (charts.location) charts.location.destroy();
         charts.location = new Chart(locationCtx, {
           type: 'pie',
           data: {
@@ -2374,15 +3624,20 @@
           options: {
             responsive: true,
             maintainAspectRatio: true,
-            aspectRatio: 2
+            aspectRatio: 2,
+            plugins: {
+              legend: {
+                position: 'bottom'
+              }
+            }
           }
         });
       }
       
       // Gráfico de status
-      const statusCtx = document.getElementById('status-chart');
-      if (statusCtx && charts.status) charts.status.destroy();
+      const statusCtx = document.getElementById('modal-status-chart');
       if (statusCtx) {
+        if (charts.status) charts.status.destroy();
         charts.status = new Chart(statusCtx, {
           type: 'bar',
           data: {
@@ -2401,6 +3656,44 @@
               y: {
                 beginAtZero: true
               }
+            },
+            plugins: {
+              legend: {
+                display: false
+              }
+            }
+          }
+        });
+      }
+      
+      // Gráfico por projeto
+      const projectCtx = document.getElementById('modal-project-chart');
+      if (projectCtx && projectLabels.length > 0) {
+        if (charts.project) charts.project.destroy();
+        
+        // Gerar cores para os projetos
+        const projectColors = projectLabels.map((_, index) => {
+          const hue = (index * 360 / projectLabels.length) % 360;
+          return `hsl(${hue}, 70%, 60%)`;
+        });
+        
+        charts.project = new Chart(projectCtx, {
+          type: 'doughnut',
+          data: {
+            labels: projectLabels,
+            datasets: [{
+              data: projectData,
+              backgroundColor: projectColors
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            aspectRatio: 2,
+            plugins: {
+              legend: {
+                position: 'bottom'
+              }
             }
           }
         });
@@ -2409,33 +3702,256 @@
 
     function renderHistory() {
       const list = document.getElementById('history-list');
+      if (!list) return;
       
-      if (history.length === 0) {
-        list.innerHTML = '<div class="empty-state">Nenhuma movimentação registrada</div>';
+      const filterType = document.getElementById('history-filter-type')?.value || 'all';
+      const searchTerm = (document.getElementById('history-search')?.value || '').toLowerCase();
+      
+      // Combinar histórico e withdrawals devolvidos
+      let allHistoryItems = [];
+      
+      // Adicionar histórico existente
+      history.forEach(h => {
+        if (h.actions && h.actions.length > 0) {
+          h.actions.forEach(action => {
+            allHistoryItems.push({
+              id: `history_${h.id}_${action.itemId || ''}`,
+              type: action.action === 'add' ? 'add' : 'remove',
+              timestamp: h.timestamp,
+              user: h.user || 'Sistema',
+              itemId: action.itemId,
+              itemName: action.itemName,
+              quantity: action.quantity,
+              location: action.location || '',
+              withdrawalDate: action.withdrawalDate,
+              returnDate: action.returnDate,
+              withdrawalReason: action.withdrawalReason,
+              notes: h.notes
+            });
+          });
+        } else {
+          // Histórico sem ações (criação, edição, exclusão)
+          const activityLog = activityLogs.find(log => 
+            log.description && log.description.includes(h.user || '') && 
+            log.timestamp === h.timestamp
+          );
+          
+          let historyType = 'create';
+          if (activityLog) {
+            if (activityLog.action === 'Criação') historyType = 'create';
+            else if (activityLog.action === 'Edição') historyType = 'edit';
+            else if (activityLog.action === 'Exclusão') historyType = 'delete';
+          }
+          
+          allHistoryItems.push({
+            id: `history_${h.id}`,
+            type: historyType,
+            timestamp: h.timestamp,
+            user: h.user || 'Sistema',
+            description: activityLog?.description || h.notes || '',
+            notes: h.notes
+          });
+        }
+      });
+      
+      // Adicionar atividades do log (apenas as que não são ações de histórico já incluídas)
+      if (activityLogs && Array.isArray(activityLogs)) {
+        activityLogs.forEach(log => {
+          // Verificar se já foi adicionado como ação de histórico
+          const alreadyAdded = allHistoryItems.some(item => {
+            // Verificar se é a mesma ação baseado em timestamp e descrição
+            if (item.timestamp === log.timestamp && item.description === log.description) {
+              return true;
+            }
+            // Verificar se a descrição está relacionada a uma ação já incluída
+            if (log.description) {
+              const descriptionLower = log.description.toLowerCase();
+              return allHistoryItems.some(h => {
+                if (h.itemName && descriptionLower.includes(h.itemName.toLowerCase())) {
+                  return true;
+                }
+                return false;
+              });
+            }
+            return false;
+          });
+          
+          if (!alreadyAdded) {
+            let logType = 'create';
+            if (log.action === 'Criação') logType = 'create';
+            else if (log.action === 'Edição') logType = 'edit';
+            else if (log.action === 'Exclusão') logType = 'delete';
+            else if (log.action === 'Adição') logType = 'add';
+            else if (log.action === 'Retirada') logType = 'remove';
+            else if (log.action === 'Devolução') logType = 'returned';
+            
+            // Tentar extrair informações do item da descrição
+            const description = log.description || '';
+            const itemNameMatch = description.match(/(?:de|do|da)\s+([^(\n]+)/);
+            const quantityMatch = description.match(/(\d+)\s+(unidades|unidade|UN|KG|L|CX)/i);
+            
+            allHistoryItems.push({
+              id: `activity_${log.id}`,
+              type: logType,
+              timestamp: log.timestamp,
+              user: log.user || 'Sistema',
+              description: description,
+              itemName: itemNameMatch ? itemNameMatch[1].trim() : null,
+              quantity: quantityMatch ? parseInt(quantityMatch[1]) : null
+            });
+          }
+        });
+      }
+      
+      // Adicionar withdrawals devolvidos
+      withdrawals.forEach(w => {
+        if (w.returnedDate || w.returned_date || w.status === 'returned') {
+          allHistoryItems.push({
+            id: `returned_${w.id}`,
+            type: 'returned',
+            timestamp: w.returnedDate ? new Date(w.returnedDate + 'T12:00:00').toLocaleString('pt-BR') : 
+                      (w.returned_date ? new Date(w.returned_date + 'T12:00:00').toLocaleString('pt-BR') : 
+                      new Date().toLocaleString('pt-BR')),
+            user: w.userName || w.user_name || 'Sistema',
+            itemId: w.itemId,
+            itemName: w.itemName || w.item_name || 'Item',
+            quantity: w.quantity || 0,
+            course: w.course || w.courseName || '',
+            withdrawalDate: w.withdrawalDate || w.withdrawal_date,
+            expectedReturnDate: w.expectedReturnDate || w.expected_return_date,
+            returnedDate: w.returnedDate || w.returned_date,
+            withdrawalReason: w.withdrawalReason || w.reason || ''
+          });
+        }
+      });
+      
+      // Filtrar por tipo
+      if (filterType !== 'all') {
+        allHistoryItems = allHistoryItems.filter(item => item.type === filterType);
+      }
+      
+      // Filtrar por busca
+      if (searchTerm) {
+        allHistoryItems = allHistoryItems.filter(item => 
+          (item.itemName && item.itemName.toLowerCase().includes(searchTerm)) ||
+          (item.user && item.user.toLowerCase().includes(searchTerm)) ||
+          (item.description && item.description.toLowerCase().includes(searchTerm)) ||
+          (item.course && item.course.toLowerCase().includes(searchTerm))
+        );
+      }
+      
+      // Ordenar por timestamp (mais recente primeiro)
+      allHistoryItems.sort((a, b) => {
+        const dateA = new Date(a.timestamp);
+        const dateB = new Date(b.timestamp);
+        return dateB - dateA;
+      });
+      
+      if (allHistoryItems.length === 0) {
+        list.innerHTML = '<div class="empty-state">Nenhuma alteração encontrada com os filtros aplicados</div>';
         return;
       }
-
-      list.innerHTML = history.map(h => `
-        <div class="history-item">
-          <div class="history-header">
-            <div>
-              <strong>Solicitação</strong>
-              <div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">Por: ${h.user || 'Sistema'}</div>
-            </div>
-            <span class="history-time">${h.timestamp}</span>
-          </div>
-          ${h.notes ? `<div style="color: var(--text-secondary); font-size: 14px; margin-top: 4px;">${h.notes}</div>` : ''}
-          <div class="history-actions">
-            ${h.actions.map(a => `
-              <div class="history-action">
-                ${a.action === 'add' ? '✅' : '❌'} ${a.itemName}: ${a.action === 'add' ? '+' : '-'}${a.quantity}
-                ${a.withdrawalDate ? ` (Saída: ${formatDate(a.withdrawalDate)}, Retorno: ${formatDate(a.returnDate)})` : ''}
-                ${a.withdrawalReason ? `<div style="margin-top: 4px; font-size: 13px; color: var(--text-secondary); font-style: italic;">Motivo: ${a.withdrawalReason}</div>` : ''}
+      
+      list.innerHTML = allHistoryItems.map(item => {
+        const typeIcons = {
+          create: { icon: '📝', label: 'Criação', color: '#4A90E2' },
+          edit: { icon: '✏️', label: 'Edição', color: '#7CB342' },
+          delete: { icon: '🗑️', label: 'Exclusão', color: '#E53935' },
+          add: { icon: '➕', label: 'Adição', color: '#4A90E2' },
+          remove: { icon: '➖', label: 'Retirada', color: '#FDD835' },
+          returned: { icon: '✅', label: 'Devolução', color: '#7CB342' }
+        };
+        
+        const typeInfo = typeIcons[item.type] || { icon: '📋', label: 'Alteração', color: '#86868B' };
+        
+        return `
+          <div class="history-item">
+            <div class="history-header">
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <div style="font-size: 24px;">${typeInfo.icon}</div>
+                <div>
+                  <strong style="color: ${typeInfo.color};">${typeInfo.label}</strong>
+                  <div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">
+                    Por: ${item.user || 'Sistema'}
+                  </div>
+                </div>
               </div>
-            `).join('')}
+              <span class="history-time">${item.timestamp}</span>
+            </div>
+            
+            ${item.itemName ? `
+              <div style="margin-top: 12px;">
+                <div style="font-size: 16px; font-weight: 600; color: var(--text-primary); margin-bottom: 8px;">
+                  ${item.itemName}
+                </div>
+                ${item.quantity !== undefined ? `
+                  <div style="font-size: 14px; color: var(--text-secondary); margin-bottom: 4px;">
+                    Quantidade: <strong style="color: var(--text-primary);">${item.type === 'add' ? '+' : item.type === 'remove' || item.type === 'returned' ? '-' : ''}${item.quantity}</strong>
+                    ${item.unit ? item.unit : ''}
+                  </div>
+                ` : ''}
+                ${item.location ? `
+                  <div style="font-size: 14px; color: var(--text-secondary); margin-bottom: 4px;">
+                    Localização: <strong>${item.location}</strong>
+                  </div>
+                ` : ''}
+              </div>
+            ` : ''}
+            
+            ${item.description ? `
+              <div style="color: var(--text-secondary); font-size: 14px; margin-top: 8px; padding: 8px; background: var(--bg-secondary); border-radius: 8px;">
+                ${item.description}
+              </div>
+            ` : ''}
+            
+            ${item.withdrawalDate || item.withdrawal_date ? `
+              <div style="margin-top: 12px; padding: 12px; background: var(--bg-secondary); border-radius: 8px; border-left: 3px solid ${typeInfo.color};">
+                <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 8px;">
+                  <strong style="color: var(--text-primary);">Informações da Retirada:</strong>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px; font-size: 13px;">
+                  <div>
+                    <span style="color: var(--text-secondary);">Data de Saída:</span>
+                    <strong style="color: var(--text-primary); margin-left: 4px;">${formatDate(item.withdrawalDate || item.withdrawal_date)}</strong>
+                  </div>
+                  ${item.expectedReturnDate || item.expected_return_date ? `
+                    <div>
+                      <span style="color: var(--text-secondary);">Retorno Previsto:</span>
+                      <strong style="color: var(--text-primary); margin-left: 4px;">${formatDate(item.expectedReturnDate || item.expected_return_date)}</strong>
+                    </div>
+                  ` : ''}
+                  ${item.returnedDate ? `
+                    <div style="color: var(--gov-green);">
+                      <span>✅ Devolvido em:</span>
+                      <strong style="margin-left: 4px;">${formatDate(item.returnedDate)}</strong>
+                    </div>
+                  ` : ''}
+                  ${item.course ? `
+                    <div>
+                      <span style="color: var(--text-secondary);">Curso/Projeto:</span>
+                      <strong style="color: var(--text-primary); margin-left: 4px;">${item.course}</strong>
+                    </div>
+                  ` : ''}
+                </div>
+                ${item.withdrawalReason ? `
+                  <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border-color);">
+                    <span style="color: var(--text-secondary); font-size: 12px;">Motivo:</span>
+                    <div style="color: var(--text-primary); font-size: 13px; margin-top: 4px; font-style: italic;">
+                      ${item.withdrawalReason}
+                    </div>
+                  </div>
+                ` : ''}
+              </div>
+            ` : ''}
+            
+            ${item.notes ? `
+              <div style="color: var(--text-secondary); font-size: 13px; margin-top: 8px; padding: 8px; background: var(--bg-secondary); border-radius: 8px;">
+                <strong>Observação:</strong> ${item.notes}
+              </div>
+            ` : ''}
           </div>
-        </div>
-      `).join('');
+        `;
+      }).join('');
     }
 
     function navigateTo(page, element) {
@@ -2456,12 +3972,78 @@
       if (page === 'history') {
         renderHistory();
       }
+      if (page === 'withdrawals') {
+        setTimeout(() => {
+          if (withdrawals.length === 0 && window.startWithdrawalsSync) {
+            // Tentar inicializar se ainda não foi inicializado
+            window.startWithdrawalsSync();
+          }
+          renderWithdrawals();
+        }, 100);
+      }
+      if (page === 'settings') {
+        renderProjectsList();
+        renderCategoriesList();
+      }
+      
+      // Atualizar FAB contextual
+      updateFAB(page);
       
       toggleSidebar();
     }
 
+    function updateFAB(page) {
+      const fabButton = document.getElementById('fab-button');
+      const fabIcon = document.getElementById('fab-icon');
+      
+      if (!fabButton || !fabIcon) return;
+      
+      if (page === 'inventory') {
+        fabButton.onclick = () => openCreateItemModal();
+        fabButton.title = 'Criar Novo Item';
+        fabIcon.textContent = 'add';
+        fabButton.style.display = 'flex';
+      } else if (page === 'withdrawals') {
+        fabButton.onclick = () => {
+          // Redirecionar para estoque para fazer retirada
+          navigateTo('inventory', document.querySelector('.sidebar-item[onclick*="inventory"]'));
+          showToast('Selecione um item do estoque para fazer uma retirada', 'info');
+        };
+        fabButton.title = 'Nova Retirada';
+        fabIcon.textContent = 'arrow_upward';
+        fabButton.style.display = 'flex';
+      } else {
+        // Para outras páginas, esconder o FAB
+        fabButton.style.display = 'none';
+      }
+    }
+
     function closeModal(modalId) {
       document.getElementById(modalId).classList.remove('active');
+    }
+
+    // Fechar modal ao clicar fora
+    function setupModalCloseOnClick() {
+      document.querySelectorAll('.modal').forEach(modal => {
+        // Remover listeners anteriores para evitar duplicação
+        const newModal = modal.cloneNode(true);
+        modal.parentNode.replaceChild(newModal, modal);
+        
+        newModal.addEventListener('click', function(e) {
+          // Se o clique foi diretamente no modal (overlay), fechar
+          if (e.target === newModal) {
+            const modalId = newModal.id;
+            closeModal(modalId);
+          }
+        });
+      });
+    }
+
+    // Configurar ao carregar
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', setupModalCloseOnClick);
+    } else {
+      setupModalCloseOnClick();
     }
 
     // Exportação
@@ -2493,7 +4075,248 @@
     }
 
     function exportToPDF() {
-      showToast('Funcionalidade de PDF em desenvolvimento', 'info');
+      try {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        
+        // Configurações
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.getHeight();
+        const margin = 15;
+        let yPos = margin;
+        
+        // Cabeçalho
+        doc.setFontSize(20);
+        doc.setFont(undefined, 'bold');
+        doc.text('Controle de Estoque - Ceará Sem Fome', pageWidth / 2, yPos, { align: 'center' });
+        
+        yPos += 10;
+        doc.setFontSize(12);
+        doc.setFont(undefined, 'normal');
+        doc.text(`Relatório gerado em: ${new Date().toLocaleString('pt-BR')}`, pageWidth / 2, yPos, { align: 'center' });
+        
+        yPos += 15;
+        
+        // Estatísticas
+        const totalItems = inventory.length;
+        const totalQuantity = inventory.reduce((sum, item) => sum + (item.quantity || 0), 0);
+        const criticalItems = inventory.filter(i => getItemStatus(i) === 'critical').length;
+        const warningItems = inventory.filter(i => getItemStatus(i) === 'warning').length;
+        const okItems = inventory.filter(i => getItemStatus(i) === 'ok').length;
+        
+        doc.setFontSize(14);
+        doc.setFont(undefined, 'bold');
+        doc.text('Resumo do Estoque', margin, yPos);
+        
+        yPos += 8;
+        doc.setFontSize(10);
+        doc.setFont(undefined, 'normal');
+        doc.text(`Total de Itens: ${totalItems}`, margin, yPos);
+        yPos += 6;
+        doc.text(`Quantidade Total: ${totalQuantity} unidades`, margin, yPos);
+        yPos += 6;
+        doc.setTextColor(76, 175, 80); // Verde
+        doc.text(`✓ Itens OK: ${okItems}`, margin, yPos);
+        yPos += 6;
+        doc.setTextColor(255, 152, 0); // Laranja
+        doc.text(`⚠ Itens em Atenção: ${warningItems}`, margin, yPos);
+        yPos += 6;
+        doc.setTextColor(244, 67, 54); // Vermelho
+        doc.text(`✗ Itens Críticos: ${criticalItems}`, margin, yPos);
+        doc.setTextColor(0, 0, 0); // Preto
+        yPos += 12;
+        
+        // Verificar se precisa de nova página
+        if (yPos > pageHeight - 40) {
+          doc.addPage();
+          yPos = margin;
+        }
+        
+        // Tabela de itens
+        doc.setFontSize(14);
+        doc.setFont(undefined, 'bold');
+        doc.text('Lista de Itens', margin, yPos);
+        yPos += 8;
+        
+        // Cabeçalho da tabela
+        doc.setFontSize(8);
+        doc.setFont(undefined, 'bold');
+        const colWidths = [25, 50, 25, 20, 20, 20, 30]; // Ajuste das larguras
+        const headers = ['Código', 'Nome', 'Categoria', 'Qtd', 'Mín', 'Local', 'Status'];
+        let xPos = margin;
+        
+        doc.setFillColor(74, 144, 226); // Azul
+        doc.rect(xPos, yPos - 5, pageWidth - 2 * margin, 7, 'F');
+        doc.setTextColor(255, 255, 255);
+        
+        headers.forEach((header, index) => {
+          doc.text(header, xPos + 2, yPos, { align: 'left' });
+          xPos += colWidths[index];
+        });
+        
+        yPos += 8;
+        doc.setTextColor(0, 0, 0);
+        doc.setFont(undefined, 'normal');
+        
+        // Itens agrupados por localização
+        const locations = ['ADM', 'IAC-SOCIAL'];
+        
+        locations.forEach(location => {
+          const locationItems = inventory.filter(i => i.location === location);
+          
+          if (locationItems.length > 0) {
+            // Verificar se precisa de nova página
+            if (yPos > pageHeight - 30) {
+              doc.addPage();
+              yPos = margin;
+            }
+            
+            // Título da localização
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'bold');
+            doc.text(`Localização: ${location}`, margin, yPos);
+            yPos += 6;
+            
+            locationItems.forEach((item, index) => {
+              // Verificar se precisa de nova página
+              if (yPos > pageHeight - 15) {
+                doc.addPage();
+                yPos = margin;
+              }
+              
+              const status = getItemStatus(item);
+              const statusColors = {
+                ok: [76, 175, 80],
+                warning: [255, 152, 0],
+                critical: [244, 67, 54]
+              };
+              const statusText = {
+                ok: 'OK',
+                warning: 'ATEN',
+                critical: 'CRIT'
+              };
+              
+              // Linha alternada
+              if (index % 2 === 0) {
+                doc.setFillColor(245, 245, 245);
+                doc.rect(margin, yPos - 4, pageWidth - 2 * margin, 5, 'F');
+              }
+              
+              xPos = margin;
+              doc.setFontSize(7);
+              doc.setFont(undefined, 'normal');
+              
+              // Código (truncado se muito longo)
+              doc.text((item.code || 'N/A').substring(0, 8), xPos + 1, yPos);
+              xPos += colWidths[0];
+              
+              // Nome (truncado se muito longo)
+              doc.text((item.name || 'N/A').substring(0, 20), xPos + 1, yPos);
+              xPos += colWidths[1];
+              
+              // Categoria (truncado)
+              doc.text((item.category || 'N/A').substring(0, 10), xPos + 1, yPos);
+              xPos += colWidths[2];
+              
+              // Quantidade
+              doc.text(String(item.quantity || 0), xPos + 1, yPos);
+              xPos += colWidths[3];
+              
+              // Mínimo
+              doc.text(String(item.minQuantity || 0), xPos + 1, yPos);
+              xPos += colWidths[4];
+              
+              // Local (já sabemos que é ADM ou IAC-SOCIAL, mas mostramos mesmo assim)
+              doc.text(item.location || 'N/A', xPos + 1, yPos);
+              xPos += colWidths[5];
+              
+              // Status com cor
+              doc.setFillColor(...statusColors[status]);
+              doc.setTextColor(255, 255, 255);
+              doc.setFont(undefined, 'bold');
+              doc.roundedRect(xPos, yPos - 3.5, colWidths[6] - 2, 4, 1, 1, 'F');
+              doc.text(statusText[status], xPos + (colWidths[6] - 2) / 2, yPos, { align: 'center' });
+              doc.setTextColor(0, 0, 0);
+              
+              yPos += 6;
+            });
+            
+            yPos += 4; // Espaço entre localizações
+          }
+        });
+        
+        // Adicionar página com itens agrupados por projeto (se houver)
+        const itemsWithProject = inventory.filter(i => i.project);
+        if (itemsWithProject.length > 0) {
+          if (yPos > pageHeight - 40) {
+            doc.addPage();
+            yPos = margin;
+          } else {
+            yPos += 10;
+          }
+          
+          doc.setFontSize(14);
+          doc.setFont(undefined, 'bold');
+          doc.text('Itens por Projeto', margin, yPos);
+          yPos += 8;
+          
+          const projects = [...new Set(itemsWithProject.map(i => i.project))];
+          
+          projects.forEach(project => {
+            if (yPos > pageHeight - 30) {
+              doc.addPage();
+              yPos = margin;
+            }
+            
+            const projectItems = itemsWithProject.filter(i => i.project === project);
+            
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'bold');
+            doc.text(`Projeto: ${project}`, margin, yPos);
+            yPos += 6;
+            
+            doc.setFontSize(7);
+            doc.setFont(undefined, 'normal');
+            
+            projectItems.forEach(item => {
+              if (yPos > pageHeight - 15) {
+                doc.addPage();
+                yPos = margin;
+              }
+              
+              doc.text(`• ${item.name} (${item.quantity || 0} ${item.unit || 'UN'}) - ${item.location}`, margin + 5, yPos);
+              yPos += 5;
+            });
+            
+            yPos += 4;
+          });
+        }
+        
+        // Rodapé em todas as páginas
+        const totalPages = doc.internal.pages.length - 1;
+        for (let i = 1; i <= totalPages; i++) {
+          doc.setPage(i);
+          doc.setFontSize(8);
+          doc.setTextColor(128, 128, 128);
+          doc.text(
+            `Página ${i} de ${totalPages}`,
+            pageWidth / 2,
+            pageHeight - 10,
+            { align: 'center' }
+          );
+        }
+        
+        // Gerar nome do arquivo
+        const fileName = `estoque_${new Date().toISOString().split('T')[0]}.pdf`;
+        
+        // Salvar PDF
+        doc.save(fileName);
+        
+        showToast('PDF gerado com sucesso!', 'success');
+      } catch (error) {
+        console.error('Erro ao gerar PDF:', error);
+        showToast('Erro ao gerar PDF. Verifique o console para mais detalhes.', 'error');
+      }
     }
 
     function backupData() {
@@ -3207,6 +5030,597 @@
     window.hideLoading = hideLoading;
     window.updateFirestoreStatus = updateFirestoreStatus;
     window.testFirestoreConnection = testFirestoreConnection;
+    window.updateQuantityPreview = updateQuantityPreview;
+    window.validateLoginPassword = validateLoginPassword;
+
+    // Funções de editar/excluir itens
+    function openEditItemModal(itemId) {
+      const itemIdStr = String(itemId);
+      const item = inventory.find(i => String(i.id) === itemIdStr || String(i.code) === itemIdStr);
+      
+      if (!item) {
+        showToast('Item não encontrado', 'error');
+        return;
+      }
+      
+      currentItem = item;
+      
+      document.getElementById('edit-item-code').value = item.code || '';
+      document.getElementById('edit-item-name').value = item.name || '';
+      document.getElementById('edit-item-category').value = item.category || 'Outros';
+      document.getElementById('edit-item-unit').value = item.unit || 'UN';
+      document.getElementById('edit-item-quantity').value = item.quantity || 0;
+      document.getElementById('edit-item-min-quantity').value = item.minQuantity || 10;
+      document.getElementById('edit-item-location').value = item.location || 'ADM';
+      document.getElementById('edit-item-project').value = item.project || '';
+      document.getElementById('edit-item-expiry').value = item.expiryDate || '';
+      
+      updateProjectSelects();
+      // Aguardar um pouco para garantir que o select foi atualizado
+      setTimeout(() => {
+        document.getElementById('edit-item-project').value = item.project || '';
+      }, 50);
+      
+      document.getElementById('edit-item-modal').classList.add('active');
+    }
+
+    async function saveItemEdit(e) {
+      e.preventDefault();
+      
+      if (!currentItem) {
+        showToast('Erro: Item não selecionado', 'error');
+        return;
+      }
+      
+      const project = document.getElementById('edit-item-project').value;
+      if (!project) {
+        showToast('Selecione um projeto!', 'warning');
+        return;
+      }
+
+      const updatedItem = {
+        ...currentItem,
+        name: document.getElementById('edit-item-name').value.trim(),
+        category: document.getElementById('edit-item-category').value,
+        unit: document.getElementById('edit-item-unit').value,
+        quantity: parseInt(document.getElementById('edit-item-quantity').value) || 0,
+        minQuantity: parseInt(document.getElementById('edit-item-min-quantity').value) || 10,
+        location: document.getElementById('edit-item-location').value,
+        project: project,
+        expiryDate: document.getElementById('edit-item-expiry').value || null
+      };
+      
+      try {
+        if (window.db) {
+          const { updateDoc, doc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+          const itemDocId = String(currentItem.id || currentItem.code);
+          await updateDoc(doc(window.db, 'inventory', itemDocId), updatedItem);
+        } else {
+          // Fallback local
+          const index = inventory.findIndex(i => String(i.id) === String(currentItem.id) || String(i.code) === String(currentItem.code));
+          if (index !== -1) {
+            inventory[index] = { ...inventory[index], ...updatedItem };
+            localStorage.setItem('inventory', JSON.stringify(inventory));
+          }
+        }
+        
+        logActivity('Edição', `Editou o item ${updatedItem.name} (${updatedItem.code})`, 'edit');
+        showToast('Item editado com sucesso!', 'success');
+        closeModal('edit-item-modal');
+        renderInventory();
+      } catch (error) {
+        console.error('Erro ao editar item:', error);
+        showToast('Erro ao editar item. Tente novamente.', 'error');
+      }
+    }
+
+    function confirmDeleteItem(itemId) {
+      const itemIdStr = String(itemId);
+      const item = inventory.find(i => String(i.id) === itemIdStr || String(i.code) === itemIdStr);
+      
+      if (!item) {
+        showToast('Item não encontrado', 'error');
+        return;
+      }
+      
+      if (!confirm(`Tem certeza que deseja excluir o item "${item.name}"?\n\nEsta ação não pode ser desfeita!`)) {
+        return;
+      }
+      
+      deleteItem(itemId);
+    }
+
+    async function deleteItem() {
+      // Buscar o item atual do modal
+      const itemCode = document.getElementById('edit-item-code')?.value;
+      if (!itemCode) {
+        showToast('Item não encontrado', 'error');
+        return;
+      }
+      
+      const item = inventory.find(i => String(i.code) === itemCode || String(i.id) === itemCode);
+      
+      if (!item) {
+        showToast('Item não encontrado', 'error');
+        return;
+      }
+      
+      if (!confirm(`Tem certeza que deseja excluir o item "${item.name}"? Esta ação não pode ser desfeita.`)) {
+        return;
+      }
+      
+      try {
+        if (window.db) {
+          const { deleteDoc, doc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+          const itemDocId = String(item.id || item.code);
+          await deleteDoc(doc(window.db, 'inventory', itemDocId));
+        } else {
+          // Fallback local
+          inventory = inventory.filter(i => String(i.id) !== String(item.id) && String(i.code) !== itemCode);
+          localStorage.setItem('inventory', JSON.stringify(inventory));
+        }
+        
+        logActivity('Exclusão', `Excluiu o item ${item.name} (${item.code})`, 'delete');
+        showToast('Item excluído com sucesso!', 'success');
+        closeModal('edit-item-modal');
+        renderInventory();
+      } catch (error) {
+        console.error('Erro ao excluir item:', error);
+        showToast('Erro ao excluir item. Tente novamente.', 'error');
+      }
+    }
+
+    // Sistema de withdrawals/movimentações
+    function initWithdrawalsSync() {
+      // Será iniciado após autenticação
+    }
+
+    window.startWithdrawalsSync = function() {
+      if (withdrawalsUnsubscribe) {
+        return;
+      }
+      
+      try {
+        if (window.db) {
+          // Importar dinamicamente
+          import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js').then(async ({ collection, onSnapshot, query, orderBy }) => {
+            try {
+              const withdrawalsRef = collection(window.db, 'withdrawals');
+              
+              // Tentar com orderBy primeiro, se falhar tenta sem
+              let q;
+              try {
+                q = query(withdrawalsRef, orderBy('createdAt', 'desc'));
+              } catch (e) {
+                // Se não tiver índice para orderBy, usar sem ordenação
+                console.warn('Usando query sem orderBy:', e);
+                q = withdrawalsRef;
+              }
+              
+              withdrawalsUnsubscribe = onSnapshot(q, 
+                (snapshot) => {
+                  withdrawals = snapshot.docs.map(doc => {
+                    const data = doc.data();
+                    const withdrawalData = {
+                      id: doc.id,
+                      ...data,
+                      // Garantir que campos essenciais existam
+                      withdrawalDate: data.withdrawalDate || data.withdrawal_date || '',
+                      expectedReturnDate: data.expectedReturnDate || data.expected_return_date || data.returnDate || '',
+                      course: data.course || data.courseName || 'Sem curso/projeto',
+                      itemName: data.itemName || data.item_name || 'Item sem nome',
+                      quantity: data.quantity || 0,
+                      unit: data.unit || 'UN',
+                      location: data.location || 'N/A',
+                      userName: data.userName || data.user_name || 'Sistema',
+                      withdrawalReason: data.withdrawalReason || data.reason || '',
+                      returnedDate: data.returnedDate || data.returned_date || null
+                    };
+                    withdrawalData.status = getWithdrawalStatus(withdrawalData);
+                    return withdrawalData;
+                  });
+                  
+                  // Ordenar por data de criação (mais recente primeiro)
+                  withdrawals.sort((a, b) => {
+                    const dateA = a.createdAt?.toDate?.() || new Date(a.withdrawalDate || 0);
+                    const dateB = b.createdAt?.toDate?.() || new Date(b.withdrawalDate || 0);
+                    return dateB - dateA;
+                  });
+                  
+                  console.log('Withdrawals atualizados:', withdrawals.length);
+                  
+                  if (window.renderWithdrawals) {
+                    renderWithdrawals();
+                  }
+                },
+                (error) => {
+                  console.error('Erro ao sincronizar withdrawals:', error);
+                  // Tentar carregar localmente se Firestore falhar
+                  loadWithdrawalsLocal();
+                }
+              );
+              
+              console.log('✅ Sincronização de withdrawals iniciada');
+            } catch (error) {
+              console.error('Erro ao configurar query de withdrawals:', error);
+              loadWithdrawalsLocal();
+            }
+          }).catch(error => {
+            console.error('Erro ao importar Firestore:', error);
+            loadWithdrawalsLocal();
+          });
+        } else {
+          loadWithdrawalsLocal();
+        }
+      } catch (error) {
+        console.error('Erro ao configurar sincronização de withdrawals:', error);
+        loadWithdrawalsLocal();
+      }
+    };
+
+    // Carregar withdrawals localmente como fallback
+    function loadWithdrawalsLocal() {
+      try {
+        const saved = localStorage.getItem('withdrawals');
+        if (saved) {
+          withdrawals = JSON.parse(saved);
+          withdrawals.forEach(w => {
+            w.status = getWithdrawalStatus(w);
+          });
+          if (window.renderWithdrawals) {
+            renderWithdrawals();
+          }
+        }
+      } catch (error) {
+        console.error('Erro ao carregar withdrawals localmente:', error);
+      }
+    }
+
+    function getWithdrawalStatus(withdrawal) {
+      if (!withdrawal) return 'in_use';
+      
+      // Verificar se já foi devolvido
+      if (withdrawal.returnedDate || withdrawal.returned_date) {
+        return 'returned';
+      }
+      
+      // Verificar se está atrasado
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      const returnDateStr = withdrawal.expectedReturnDate || withdrawal.expected_return_date || withdrawal.returnDate;
+      if (returnDateStr) {
+        const returnDate = new Date(returnDateStr);
+        returnDate.setHours(0, 0, 0, 0);
+        
+        if (today > returnDate) {
+          return 'overdue';
+        }
+      }
+      
+      return 'in_use';
+    }
+
+    function renderWithdrawals() {
+      const content = document.getElementById('withdrawals-content');
+      if (!content) {
+        console.warn('Elemento withdrawals-content não encontrado');
+        return;
+      }
+      
+      console.log('Renderizando withdrawals. Total:', withdrawals.length);
+      
+      if (!withdrawals || withdrawals.length === 0) {
+        content.innerHTML = '<div class="empty-state">Nenhum item em uso encontrado. Quando você retirar um item do estoque, ele aparecerá aqui.</div>';
+        return;
+      }
+      
+      const courseFilter = document.getElementById('filter-course')?.value.toLowerCase() || '';
+      const statusFilter = document.getElementById('filter-status')?.value || 'all';
+      const locationFilter = document.getElementById('filter-location')?.value || 'all';
+      
+      let filtered = withdrawals.filter(w => {
+        if (!w) return false;
+        
+        // Filtrar apenas itens que não foram devolvidos (ou mostrar todos se filtro incluir devolvidos)
+        if (statusFilter === 'all' || statusFilter === 'returned') {
+          // Mostrar todos incluindo devolvidos se o filtro permitir
+        } else {
+          // Se filtro não incluir devolvidos, filtrar apenas ativos
+          if (w.status === 'returned' || w.returnedDate || w.returned_date) {
+            return false;
+          }
+        }
+        
+        const course = (w.course || w.courseName || 'Sem curso/projeto').toLowerCase();
+        const matchCourse = !courseFilter || course.includes(courseFilter);
+        const matchStatus = statusFilter === 'all' || w.status === statusFilter;
+        
+        return matchCourse && matchStatus;
+      });
+      
+      console.log('Withdrawals filtrados:', filtered.length);
+      
+      // Agrupar por curso
+      const grouped = {};
+      filtered.forEach(w => {
+        const course = w.course || w.courseName || 'Sem curso/projeto';
+        if (!grouped[course]) {
+          grouped[course] = [];
+        }
+        grouped[course].push(w);
+      });
+      
+      if (Object.keys(grouped).length === 0) {
+        content.innerHTML = '<div class="empty-state">Nenhum item encontrado com os filtros aplicados. Tente ajustar os filtros.</div>';
+        return;
+      }
+      
+      content.innerHTML = Object.keys(grouped).map(course => {
+        const courseItems = grouped[course];
+        const activeItems = courseItems.filter(w => {
+          const s = getWithdrawalStatus(w);
+          return s === 'in_use' || s === 'overdue';
+        });
+        const overdueItems = courseItems.filter(w => getWithdrawalStatus(w) === 'overdue');
+        const totalQuantity = activeItems.reduce((sum, w) => sum + (w.quantity || 0), 0);
+        
+        // Encontrar data de retorno mais próxima
+        let nearestReturnDate = null;
+        activeItems.forEach(w => {
+          const returnDate = w.expectedReturnDate || w.expected_return_date || w.returnDate;
+          if (returnDate) {
+            if (!nearestReturnDate || new Date(returnDate) < new Date(nearestReturnDate)) {
+              nearestReturnDate = returnDate;
+            }
+          }
+        });
+        
+        return `
+        <div class="withdrawals-group">
+          <div class="withdrawals-group-header">
+            <div class="withdrawals-group-title">${course}</div>
+            <div class="withdrawals-group-summary">
+              <span class="badge">📦 ${totalQuantity} itens</span>
+              ${overdueItems.length > 0 ? `<span class="badge" style="background: rgba(229, 57, 53, 0.1); color: var(--gov-red);">⚠️ ${overdueItems.length} atrasado${overdueItems.length > 1 ? 's' : ''}</span>` : ''}
+              ${nearestReturnDate ? `<span class="badge" style="background: rgba(255, 193, 7, 0.1); color: var(--gov-yellow);">📅 Retorno: ${formatDate(nearestReturnDate)}</span>` : ''}
+            </div>
+          </div>
+          <div class="withdrawals-shelf-grid">
+            ${grouped[course].map(w => {
+              const status = getWithdrawalStatus(w);
+              const statusLabels = {
+                in_use: 'Em Uso',
+                overdue: 'Atrasado',
+                returned: 'Devolvido'
+              };
+              const statusClass = status;
+              
+              return `
+                <div class="withdrawal-shelf-item">
+                  <div class="withdrawal-shelf-item-header">
+                    <span class="withdrawal-status ${statusClass}">${statusLabels[status]}</span>
+                  </div>
+                  <div class="withdrawal-shelf-item-name">${w.itemName || w.item_name || 'Item sem nome'}</div>
+                  <div class="withdrawal-shelf-item-details">
+                    <strong>Quantidade:</strong> ${w.quantity || 0} ${w.unit || 'UN'}
+                  </div>
+                  <div class="withdrawal-shelf-item-details">
+                    <strong>Saída:</strong> ${formatDate(w.withdrawalDate || w.withdrawal_date || '')}
+                  </div>
+                  <div class="withdrawal-shelf-item-details" style="color: ${status === 'overdue' ? 'var(--gov-red)' : status === 'returned' ? 'var(--gov-green)' : 'var(--text-secondary)'};">
+                    <strong>Retorno:</strong> ${formatDate(w.expectedReturnDate || w.expected_return_date || w.returnDate || '')}
+                  </div>
+                  ${(w.returnedDate || w.returned_date) ? `
+                    <div class="withdrawal-shelf-item-details" style="color: var(--gov-green);">
+                      <strong>Devolvido:</strong> ${formatDate(w.returnedDate || w.returned_date)}
+                    </div>
+                  ` : ''}
+                  ${(w.withdrawalReason || w.reason) ? `
+                    <div class="withdrawal-shelf-item-details" style="margin-top: 8px; padding: 8px; background: var(--bg-secondary); border-radius: 6px; font-size: 12px;">
+                      ${w.withdrawalReason || w.reason}
+                    </div>
+                  ` : ''}
+                  ${status !== 'returned' ? `
+                    <button class="submit-btn btn-success" style="margin-top: 12px; padding: 8px; font-size: 14px;" onclick="markAsReturned('${w.id}')">
+                      Marcar como Devolvido
+                    </button>
+                  ` : ''}
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+        `;
+      }).join('');
+    }
+
+    function filterWithdrawals() {
+      renderWithdrawals();
+    }
+
+    async function markAsReturned(withdrawalId) {
+      try {
+        // Encontrar o withdrawal
+        const withdrawal = withdrawals.find(w => w.id === withdrawalId);
+        if (!withdrawal) {
+          showToast('Movimentação não encontrada!', 'error');
+          return;
+        }
+
+        // Verificar se já foi devolvido
+        if (withdrawal.returnedDate || withdrawal.returned_date || withdrawal.status === 'returned') {
+          showToast('Este item já foi marcado como devolvido!', 'warning');
+          return;
+        }
+
+        const returnedDate = new Date().toISOString().split('T')[0];
+        
+        // Atualizar no Firestore se disponível
+        if (window.db) {
+          try {
+            const { updateDoc, doc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+            await updateDoc(doc(window.db, 'withdrawals', withdrawalId), {
+              returnedDate: returnedDate,
+              returned_date: returnedDate, // Compatibilidade
+              status: 'returned'
+            });
+            console.log('Withdrawal atualizado no Firestore');
+          } catch (firestoreError) {
+            console.error('Erro ao atualizar no Firestore:', firestoreError);
+            // Continuar com fallback local
+          }
+        }
+        
+        // Atualizar localmente
+        const withdrawalIndex = withdrawals.findIndex(w => w.id === withdrawalId);
+        if (withdrawalIndex !== -1) {
+          withdrawals[withdrawalIndex].returnedDate = returnedDate;
+          withdrawals[withdrawalIndex].returned_date = returnedDate;
+          withdrawals[withdrawalIndex].status = 'returned';
+          
+          // Salvar localmente
+          try {
+            localStorage.setItem('withdrawals', JSON.stringify(withdrawals));
+          } catch (localError) {
+            console.warn('Erro ao salvar localmente:', localError);
+          }
+        }
+        
+        // Adicionar quantidade de volta ao estoque
+        if (withdrawal.itemId) {
+          const item = inventory.find(i => 
+            String(i.id) === String(withdrawal.itemId) || 
+            String(i.code) === String(withdrawal.itemId)
+          );
+          
+          if (item) {
+            const quantityToAdd = withdrawal.quantity || 0;
+            const newQuantity = (item.quantity || 0) + quantityToAdd;
+            
+            // Atualizar no Firestore se disponível
+            if (window.db) {
+              try {
+                const { updateDoc, doc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+                const itemDocId = String(item.id || item.code);
+                await updateDoc(doc(window.db, 'inventory', itemDocId), {
+                  quantity: newQuantity
+                });
+                console.log('Estoque atualizado no Firestore');
+              } catch (firestoreError) {
+                console.error('Erro ao atualizar estoque no Firestore:', firestoreError);
+                // Continuar com fallback local
+              }
+            }
+            
+            // Atualizar localmente
+            const itemIndex = inventory.findIndex(i => 
+              String(i.id) === String(item.id) || 
+              String(i.code) === String(item.code)
+            );
+            if (itemIndex !== -1) {
+              inventory[itemIndex].quantity = newQuantity;
+              try {
+                localStorage.setItem('inventory', JSON.stringify(inventory));
+              } catch (localError) {
+                console.warn('Erro ao salvar estoque localmente:', localError);
+              }
+            }
+          } else {
+            console.warn('Item não encontrado no estoque para devolução:', withdrawal.itemId);
+          }
+        }
+        
+        // Registrar devolução no histórico
+        logActivity('Devolução', `Devolveu ${withdrawal.quantity || 0} ${withdrawal.unit || 'unidades'} de ${withdrawal.itemName || 'item'} - Devolvido em: ${returnedDate}`, 'returned');
+        
+        // Adicionar ao histórico
+        history.unshift({
+          id: Date.now(),
+          timestamp: new Date().toLocaleString('pt-BR'),
+          user: currentUser ? currentUser.name : (withdrawal.userName || 'Sistema'),
+          actions: [{
+            itemId: withdrawal.itemId,
+            itemName: withdrawal.itemName || 'Item',
+            action: 'returned',
+            quantity: withdrawal.quantity || 0,
+            withdrawalDate: withdrawal.withdrawalDate || withdrawal.withdrawal_date,
+            returnDate: withdrawal.expectedReturnDate || withdrawal.expected_return_date,
+            returnedDate: returnedDate,
+            withdrawalReason: withdrawal.withdrawalReason || withdrawal.reason || ''
+          }],
+          notes: `Item devolvido em ${returnedDate}`
+        });
+        
+        saveData();
+        
+        // Registrar devolução no histórico e log de atividades
+        const returnedTimestamp = new Date().toLocaleString('pt-BR');
+        
+        logActivity('Devolução', `Devolveu ${withdrawal.quantity || 0} ${withdrawal.unit || 'unidades'} de ${withdrawal.itemName || withdrawal.item_name || 'item'} - Devolvido em: ${returnedDate}`, 'returned');
+        
+        // Adicionar ao histórico
+        history.unshift({
+          id: Date.now(),
+          timestamp: returnedTimestamp,
+          user: currentUser ? (currentUser.name || currentUser.email) : (withdrawal.userName || withdrawal.user_name || 'Sistema'),
+          actions: [{
+            itemId: withdrawal.itemId,
+            itemName: withdrawal.itemName || withdrawal.item_name || 'Item',
+            action: 'returned',
+            quantity: withdrawal.quantity || 0,
+            unit: withdrawal.unit || 'UN',
+            location: withdrawal.location || '',
+            withdrawalDate: withdrawal.withdrawalDate || withdrawal.withdrawal_date,
+            returnDate: withdrawal.expectedReturnDate || withdrawal.expected_return_date,
+            returnedDate: returnedDate,
+            course: withdrawal.course || withdrawal.courseName || '',
+            withdrawalReason: withdrawal.withdrawalReason || withdrawal.reason || ''
+          }],
+          notes: `Item devolvido em ${returnedDate}. Quantidade adicionada de volta ao estoque.`
+        });
+        
+        saveData();
+        
+        // Atualizar renderização
+        if (window.renderWithdrawals) {
+          renderWithdrawals();
+        }
+        if (window.renderInventory) {
+          renderInventory();
+        }
+        
+        showToast('Item marcado como devolvido e quantidade adicionada ao estoque!', 'success');
+      } catch (error) {
+        console.error('Erro ao marcar como devolvido:', error);
+        showToast(`Erro ao marcar como devolvido: ${error.message || 'Erro desconhecido'}`, 'error');
+      }
+    }
+
+    window.openEditItemModal = openEditItemModal;
+    window.confirmDeleteItem = confirmDeleteItem;
+    window.deleteItem = deleteItem;
+    window.saveItemEdit = saveItemEdit;
+    window.openCreateItemModal = openCreateItemModal;
+    window.createItem = createItem;
+    window.renderWithdrawals = renderWithdrawals;
+    window.filterWithdrawals = filterWithdrawals;
+    window.markAsReturned = markAsReturned;
+    window.getWithdrawalStatus = getWithdrawalStatus;
+    window.navigateTo = navigateTo;
+    window.updateFAB = updateFAB;
+    window.addProject = addProject;
+    window.openEditProjectModal = openEditProjectModal;
+    window.deleteProject = deleteProject;
+    window.loadProjects = loadProjects;
+    window.renderProjectsList = renderProjectsList;
+    window.addCategory = addCategory;
+    window.openEditCategoryModal = openEditCategoryModal;
+    window.deleteCategory = deleteCategory;
+    window.loadCategories = loadCategories;
+    window.renderCategoriesList = renderCategoriesList;
+    window.openChartsModal = openChartsModal;
+    window.renderCharts = renderCharts;
   </script>
 </body>
 </html>

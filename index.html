@@ -219,28 +219,93 @@
     }
 
     :root {
-      /* Cores principais - iOS/Mac Style */
-      --gov-blue: #007AFF;
-      --gov-green: #34C759;
-      --gov-yellow: #FF9500;
-      --gov-red: #FF3B30;
-      --gov-gray: #8E8E93;
-      --gov-light: #F2F2F7;
-      --bg-white: #FFFFFF;
+      /* ============================================
+         DESIGN SYSTEM - Tipografia Padronizada
+         ============================================ */
+      --font-size-xs: 12px;    /* Labels, badges pequenos */
+      --font-size-sm: 14px;    /* Texto secundário, labels */
+      --font-size-base: 16px;  /* Texto padrão */
+      --font-size-lg: 20px;    /* Subtítulos */
+      --font-size-xl: 24px;    /* Títulos de seção */
+      --font-size-2xl: 32px;   /* Títulos principais */
       
-      /* Sombras iOS/Mac */
+      --font-weight-normal: 400;
+      --font-weight-medium: 500;
+      --font-weight-semibold: 600;
+      --font-weight-bold: 700;
+      --font-weight-extrabold: 800;
+      
+      --line-height-tight: 1.2;
+      --line-height-normal: 1.5;
+      --line-height-relaxed: 1.75;
+      
+      /* ============================================
+         DESIGN SYSTEM - Cores com Significado
+         ============================================ */
+      /* Cores Primárias */
+      --color-primary: #007AFF;        /* Ações principais, links */
+      --color-primary-hover: #0051D5;
+      --color-primary-light: rgba(0, 122, 255, 0.12);
+      
+      /* Cores Semânticas */
+      --color-success: #34C759;        /* Sucesso, estoque OK */
+      --color-success-hover: #28A745;
+      --color-success-light: rgba(52, 199, 89, 0.12);
+      
+      --color-warning: #FF9500;        /* Atenção, alerta, estoque baixo */
+      --color-warning-hover: #FF6B00;
+      --color-warning-light: rgba(255, 149, 0, 0.12);
+      
+      --color-error: #FF3B30;          /* Erro, risco, estoque crítico */
+      --color-error-hover: #D32F2F;
+      --color-error-light: rgba(255, 59, 48, 0.12);
+      
+      /* Cores Neutras */
+      --color-gray: #8E8E93;
+      --color-gray-light: #C7C7CC;
+      --color-gray-lighter: #E5E5EA;
+      --color-bg-light: #F2F2F7;
+      --color-white: #FFFFFF;
+      
+      /* Compatibilidade (mantendo variáveis antigas) */
+      --gov-blue: var(--color-primary);
+      --gov-green: var(--color-success);
+      --gov-yellow: var(--color-warning);
+      --gov-red: var(--color-error);
+      --gov-gray: var(--color-gray);
+      --gov-light: var(--color-bg-light);
+      --bg-white: var(--color-white);
+      
+      /* ============================================
+         DESIGN SYSTEM - Espaçamentos
+         ============================================ */
+      --spacing-xs: 4px;
+      --spacing-sm: 8px;
+      --spacing-md: 12px;
+      --spacing-lg: 16px;
+      --spacing-xl: 24px;
+      --spacing-2xl: 32px;
+      --spacing-3xl: 48px;
+      
+      /* ============================================
+         DESIGN SYSTEM - Sombras (menos é mais)
+         ============================================ */
       --shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
       --shadow-md: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.06);
       --shadow-lg: 0 10px 15px rgba(0,0,0,0.1), 0 4px 6px rgba(0,0,0,0.05);
       --shadow-xl: 0 20px 25px rgba(0,0,0,0.1), 0 10px 10px rgba(0,0,0,0.04);
       
-      /* Bordas hierárquicas iOS */
+      /* ============================================
+         DESIGN SYSTEM - Bordas (menos borda, mais contraste)
+         ============================================ */
       --radius-sm: 8px;   /* Badges, chips */
       --radius-md: 12px;  /* Inputs, botões */
       --radius-lg: 16px;  /* Cards principais */
       --radius-xl: 20px;  /* Modais, containers grandes */
       
-      /* Tema claro (padrão) - iOS Style */
+      /* ============================================
+         DESIGN SYSTEM - Tema Claro
+         ============================================ */
       --bg-primary: #F2F2F7;
       --bg-secondary: #FFFFFF;
       --bg-tertiary: #F9F9F9;
@@ -637,14 +702,39 @@
     }
 
     .item-card:hover {
-      transform: translateY(-1px);
+      transform: translateY(-2px);
       box-shadow: var(--shadow-md);
-      border-color: var(--gov-blue);
+      border-color: var(--color-primary);
+      background: var(--bg-secondary);
     }
 
     .item-card:active {
-      transform: scale(0.98);
+      transform: scale(0.97) translateY(0);
       box-shadow: var(--shadow);
+      transition: all 0.1s;
+    }
+    
+    /* Microinteração suave ao salvar */
+    .item-card.saving {
+      opacity: 0.7;
+      pointer-events: none;
+    }
+    
+    .item-card.saving::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 122, 255, 0.05);
+      border-radius: var(--radius-lg);
+      animation: pulse-subtle 1.5s ease-in-out infinite;
+    }
+    
+    @keyframes pulse-subtle {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 0.5; }
     }
 
     .item-card.disabled {
@@ -739,30 +829,34 @@
       50% { opacity: 0.5; }
     }
 
+    /* ============================================
+       HIERARQUIA VISUAL DOS CARDS (Leitura em Z)
+       ============================================ */
     .item-name {
-      font-weight: 700;
-      text-align: left;
-      font-size: 22px;
+      /* 1. O que é? (nome) - PRINCIPAL */
+      font-weight: var(--font-weight-bold);
+      font-size: var(--font-size-xl);
       color: var(--text-primary);
-      margin-bottom: 12px;
-      line-height: 1.3;
+      margin-bottom: var(--spacing-md);
+      line-height: var(--line-height-tight);
       letter-spacing: -0.02em;
     }
 
     .item-category {
-      font-size: 13px;
+      /* Informação secundária */
+      font-size: var(--font-size-xs);
       color: var(--text-secondary);
-      text-align: left;
       opacity: var(--opacity-secondary);
-      font-weight: 500;
+      font-weight: var(--font-weight-medium);
+      margin-bottom: var(--spacing-sm);
     }
 
     .item-quantity {
-      font-size: 40px;
-      font-weight: 800;
-      text-align: left;
-      line-height: 1;
-      margin: 12px 0;
+      /* 2. Quanto tem? (quantidade) - BEM DESTACADA */
+      font-size: var(--font-size-2xl);
+      font-weight: var(--font-weight-extrabold);
+      line-height: var(--line-height-tight);
+      margin: var(--spacing-lg) 0;
       letter-spacing: -0.03em;
     }
 
@@ -779,12 +873,12 @@
     }
 
     .item-info {
-      font-size: 12px;
+      /* Informação secundária */
+      font-size: var(--font-size-xs);
       color: var(--text-secondary);
-      text-align: left;
-      margin-top: 4px;
+      margin-top: var(--spacing-xs);
       opacity: var(--opacity-secondary);
-      font-weight: 500;
+      font-weight: var(--font-weight-medium);
     }
 
     .badge {
@@ -816,11 +910,12 @@
     }
 
     .item-meta {
+      /* 4. Onde / para quem? - Informação secundária */
       display: flex;
       flex-direction: column;
-      gap: 4px;
-      margin-top: 12px;
-      padding-top: 12px;
+      gap: var(--spacing-xs);
+      margin-top: var(--spacing-lg);
+      padding-top: var(--spacing-lg);
       border-top: 1px solid var(--border-color);
     }
 
@@ -1525,10 +1620,56 @@
       box-shadow: 0 0 0 4px rgba(74, 144, 226, 0.1);
     }
 
+    /* ============================================
+       ESTADOS VAZIOS - Mais Humanos e Orientados
+       ============================================ */
     .empty-state {
       text-align: center;
-      padding: 40px;
+      padding: var(--spacing-3xl) var(--spacing-xl);
       color: var(--text-secondary);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--spacing-lg);
+    }
+
+    .empty-state-icon {
+      font-size: 64px;
+      opacity: 0.3;
+      margin-bottom: var(--spacing-md);
+    }
+
+    .empty-state-title {
+      font-size: var(--font-size-lg);
+      font-weight: var(--font-weight-semibold);
+      color: var(--text-primary);
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .empty-state-message {
+      font-size: var(--font-size-base);
+      color: var(--text-secondary);
+      line-height: var(--line-height-relaxed);
+      max-width: 400px;
+      margin: 0 auto;
+    }
+
+    .empty-state-action {
+      margin-top: var(--spacing-lg);
+      padding: var(--spacing-md) var(--spacing-xl);
+      background: var(--color-primary);
+      color: white;
+      border: none;
+      border-radius: var(--radius-md);
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-semibold);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .empty-state-action:hover {
+      background: var(--color-primary-hover);
+      transform: translateY(-1px);
     }
 
     .page-content {
@@ -1975,7 +2116,20 @@
       }
 
       .item-card {
-        padding: 20px;
+        padding: var(--spacing-lg);
+      }
+      
+      /* Botões maiores no mobile */
+      .item-actions {
+        gap: var(--spacing-sm);
+      }
+      
+      .item-edit-btn,
+      .item-withdraw-btn,
+      .item-add-btn {
+        min-height: 44px; /* Tamanho mínimo recomendado para touch */
+        padding: var(--spacing-md) var(--spacing-lg);
+        font-size: var(--font-size-sm);
       }
 
       .form-row {
@@ -2629,18 +2783,56 @@
           <div class="form-group" style="flex: 1; min-width: 200px;">
             <label class="form-label">Filtrar por Tipo</label>
             <select class="form-input" id="history-filter-type" onchange="renderHistory()">
-              <option value="all">Todos</option>
+              <option value="all">Todos os Tipos</option>
               <option value="create">Criação</option>
               <option value="edit">Edição</option>
               <option value="delete">Exclusão</option>
-              <option value="add">Adição</option>
               <option value="remove">Retirada</option>
-              <option value="returned">Devoluções</option>
+              <option value="add">Adição</option>
+              <option value="returned">Devolução</option>
             </select>
           </div>
           <div class="form-group" style="flex: 1; min-width: 200px;">
+            <label class="form-label">Filtrar por Status</label>
+            <select class="form-input" id="history-filter-status" onchange="renderHistory()">
+              <option value="all">Todos os Status</option>
+              <option value="active">Em Uso</option>
+              <option value="returned">Devolvido</option>
+              <option value="overdue">Atrasado</option>
+            </select>
+          </div>
+          <div class="form-group" style="flex: 1; min-width: 200px;">
+            <label class="form-label">Filtrar por Local</label>
+            <select class="form-input" id="history-filter-location" onchange="renderHistory()">
+              <option value="all">Todas as Localizações</option>
+              <option value="ADM">ADM</option>
+              <option value="IAC-SOCIAL">IAC-SOCIAL</option>
+            </select>
+          </div>
+          <div class="form-group" style="flex: 1; min-width: 200px;">
+            <label class="form-label">Filtrar por Projeto</label>
+            <select class="form-input" id="history-filter-project" onchange="renderHistory()">
+              <option value="all">Todos os Projetos</option>
+            </select>
+          </div>
+          <div class="form-group" style="flex: 1; min-width: 200px;">
+            <label class="form-label">Período - De</label>
+            <input type="date" class="form-input" id="history-filter-date-from" onchange="renderHistory()">
+          </div>
+          <div class="form-group" style="flex: 1; min-width: 200px;">
+            <label class="form-label">Período - Até</label>
+            <input type="date" class="form-input" id="history-filter-date-to" onchange="renderHistory()">
+          </div>
+          <div class="form-group" style="flex: 1; min-width: 200px;">
             <label class="form-label">Buscar</label>
-            <input type="text" class="form-input" id="history-search" placeholder="Buscar por item, usuário..." oninput="renderHistory()">
+            <input type="text" class="form-input" id="history-search" placeholder="Buscar por item, usuário, curso..." oninput="renderHistory()">
+          </div>
+          <div class="form-group" style="flex: 0 0 auto;">
+            <label class="form-label" style="opacity: 0;">Limpar</label>
+            <button class="submit-btn btn-secondary" onclick="clearHistoryFilters()" style="white-space: nowrap;">
+              <span class="material-icons" style="font-size: 18px; vertical-align: middle;">clear</span>
+              Limpar Filtros
+            </button>
           </div>
         </div>
         <div id="history-list" class="history-list"></div>
@@ -3692,7 +3884,19 @@
       if (!list) return;
       
       if (projects.length === 0) {
-        list.innerHTML = '<div class="empty-state" style="padding: 20px; text-align: center; color: var(--text-secondary);">Nenhum projeto cadastrado</div>';
+        list.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">📁</div>
+            <div class="empty-state-title">Nenhum projeto cadastrado</div>
+            <div class="empty-state-message">
+              Crie um curso/projeto para organizar melhor seus itens e movimentações.
+            </div>
+            <button class="empty-state-action" onclick="openCreateCourseModal()">
+              <span class="material-icons" style="font-size: 18px; vertical-align: middle; margin-right: 4px;">add</span>
+              Criar Primeiro Projeto
+            </button>
+          </div>
+        `;
         return;
       }
       
@@ -3751,7 +3955,19 @@
       }
       
       project.name = trimmedName;
-      saveProjects();
+      
+      // Atualizar o nome do projeto nos cursos correspondentes
+      const courseIndex = courses.findIndex(c => String(c.id) === String(project.id));
+      if (courseIndex !== -1) {
+        courses[courseIndex].name = trimmedName;
+        saveCourses();
+      } else {
+        saveProjects();
+      }
+      
+      // Atualizar selects de projetos
+      updateProjectSelects();
+      
       showToast('Projeto editado com sucesso!', 'success');
     }
 
@@ -3770,8 +3986,21 @@
         }
       }
       
+      // Remover do array de projetos
       projects = projects.filter(p => p.id !== projectId);
-      saveProjects();
+      
+      // Remover também dos cursos se existir
+      const courseIndex = courses.findIndex(c => String(c.id) === String(projectId));
+      if (courseIndex !== -1) {
+        courses.splice(courseIndex, 1);
+        saveCourses();
+      } else {
+        saveProjects();
+      }
+      
+      // Atualizar selects de projetos
+      updateProjectSelects();
+      
       showToast('Projeto removido com sucesso!', 'success');
     }
 
@@ -3838,7 +4067,19 @@
       if (!list) return;
       
       if (categories.length === 0) {
-        list.innerHTML = '<div class="empty-state" style="padding: 20px; text-align: center; color: var(--text-secondary); font-size: 14px;">Nenhuma categoria cadastrada</div>';
+        list.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">🏷️</div>
+            <div class="empty-state-title">Nenhuma categoria cadastrada</div>
+            <div class="empty-state-message">
+              Adicione categorias para organizar melhor seus itens de estoque.
+            </div>
+            <button class="empty-state-action" onclick="document.getElementById('new-category-name').focus()">
+              <span class="material-icons" style="font-size: 18px; vertical-align: middle; margin-right: 4px;">add</span>
+              Adicionar Categoria
+            </button>
+          </div>
+        `;
         return;
       }
       
@@ -4486,7 +4727,22 @@
       updateFilterCounter(filtered.length, inventory.length, filter, currentLocationFilter);
 
       if (filtered.length === 0) {
-        grid.innerHTML = '<div class="empty-state">Nenhum item encontrado</div>';
+        grid.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">📦</div>
+            <div class="empty-state-title">Nenhum item encontrado</div>
+            <div class="empty-state-message">
+              ${currentLocationFilter !== 'all' 
+                ? `Não há itens na localização selecionada. Tente alterar o filtro ou adicionar novos itens.`
+                : `Não há itens cadastrados no estoque ainda. Comece adicionando seu primeiro item!`
+              }
+            </div>
+            <button class="empty-state-action" onclick="openCreateItemModal()">
+              <span class="material-icons" style="font-size: 18px; vertical-align: middle; margin-right: 4px;">add</span>
+              Adicionar Primeiro Item
+            </button>
+          </div>
+        `;
         return;
       }
 
@@ -5013,6 +5269,31 @@
       };
 
       try {
+        // Verificar se o item já existe pelo ID (evitar duplicação)
+        const existingItemIndex = inventory.findIndex(i => String(i.id) === String(newItem.id));
+        if (existingItemIndex !== -1) {
+          console.warn('Item já existe, atualizando ao invés de duplicar:', newItem.id);
+          inventory[existingItemIndex] = newItem;
+        } else {
+          // Verificar também se já existe item com mesmo nome e localização (evitar duplicação por sincronização)
+          const duplicateItem = inventory.find(i => 
+            i.name.toLowerCase() === newItem.name.toLowerCase() && 
+            i.location === newItem.location &&
+            Math.abs(new Date(i.createdAt || 0).getTime() - new Date().getTime()) < 5000 // Criado há menos de 5 segundos
+          );
+          
+          if (duplicateItem) {
+            console.warn('Item duplicado detectado (provavelmente por sincronização), atualizando:', duplicateItem.id);
+            const dupIndex = inventory.findIndex(i => String(i.id) === String(duplicateItem.id));
+            if (dupIndex !== -1) {
+              inventory[dupIndex] = { ...newItem, id: duplicateItem.id }; // Manter o ID original
+            }
+          } else if (!window.isSyncingFromRTDB || !window.isSyncingFromRTDB.inventory) {
+            // Adicionar apenas se não existir e não estiver sincronizando do Realtime Database
+            inventory.push(newItem);
+          }
+        }
+        
         if (window.db) {
           try {
           const { setDoc, doc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
@@ -5023,9 +5304,8 @@
           }
         }
         
-        // Sempre salvar localmente também
-          inventory.push(newItem);
-          localStorage.setItem('inventory', JSON.stringify(inventory));
+        // Sempre salvar localmente
+        localStorage.setItem('inventory', JSON.stringify(inventory));
         
           // Sincronizar automaticamente no Realtime Database
           await autoSyncToRealtimeDB('inventory', inventory);
@@ -5123,8 +5403,151 @@
         `;
       }).join('');
       
+      // Itens críticos para card destacado
+      const criticalItemsList = inventory.filter(i => getItemStatus(i) === 'critical').slice(0, 5);
+      
+      // Alertas automáticos
+      const now = new Date();
+      const overdueItems = withdrawals.filter(w => {
+        if (w.returnedDate || w.returned_date || w.status === 'returned') return false;
+        if (!w.expectedReturnDate && !w.expected_return_date) return false;
+        const expectedDate = new Date(w.expectedReturnDate || w.expected_return_date);
+        return expectedDate < now;
+      });
+      
+      const lowStockItems = inventory.filter(i => {
+        const status = getItemStatus(i);
+        return status === 'critical' || status === 'warning';
+      });
+      
+      const coursesWithPendingItems = {};
+      withdrawals.forEach(w => {
+        if (w.returnedDate || w.returned_date || w.status === 'returned') return;
+        const courseName = w.course || w.courseName || 'Sem curso';
+        if (!coursesWithPendingItems[courseName]) {
+          coursesWithPendingItems[courseName] = 0;
+        }
+        coursesWithPendingItems[courseName]++;
+      });
+      const coursesWithManyPending = Object.entries(coursesWithPendingItems)
+        .filter(([_, count]) => count >= 5)
+        .map(([name, count]) => ({ name, count }));
+      
       document.getElementById('dashboard-content').innerHTML = `
-        <!-- Cards principais -->
+        <!-- 🚨 ALERTAS AUTOMÁTICOS -->
+        ${overdueItems.length > 0 ? `
+          <div class="dashboard-card" style="grid-column: span 2; border-left: 4px solid var(--color-error); background: linear-gradient(135deg, rgba(255, 59, 48, 0.1) 0%, var(--card-bg) 100%);">
+            <div class="dashboard-card-icon red">
+              <span class="material-icons">warning</span>
+            </div>
+            <div class="dashboard-card-title">🚨 Itens Atrasados</div>
+            <div class="dashboard-card-value">${overdueItems.length}</div>
+            <div class="dashboard-card-subtitle">Itens não devolvidos após data prevista</div>
+            <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-color);">
+              ${overdueItems.slice(0, 3).map(w => {
+                const item = inventory.find(i => String(i.id) === String(w.itemId) || i.name === w.itemName);
+                return `
+                  <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; font-size: 14px;">
+                    <span style="color: var(--text-primary); font-weight: 500;">${w.itemName || 'Item'}</span>
+                    <span style="color: var(--color-error); font-weight: 700;">${w.expectedReturnDate || w.expected_return_date || 'N/A'}</span>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        ` : ''}
+        
+        ${lowStockItems.length > 0 ? `
+          <div class="dashboard-card" style="grid-column: span 2; border-left: 4px solid var(--color-warning);">
+            <div class="dashboard-card-icon yellow">
+              <span class="material-icons">inventory</span>
+            </div>
+            <div class="dashboard-card-title">⚠️ Estoque Baixo</div>
+            <div class="dashboard-card-value">${lowStockItems.length}</div>
+            <div class="dashboard-card-subtitle">Itens abaixo do mínimo ou críticos</div>
+          </div>
+        ` : ''}
+        
+        ${coursesWithManyPending.length > 0 ? `
+          <div class="dashboard-card" style="grid-column: span 2; border-left: 4px solid var(--color-warning);">
+            <div class="dashboard-card-icon orange">
+              <span class="material-icons">folder</span>
+            </div>
+            <div class="dashboard-card-title">📦 Cursos com Muitos Itens Pendentes</div>
+            <div class="dashboard-card-value">${coursesWithManyPending.length}</div>
+            <div class="dashboard-card-subtitle">Cursos com 5+ itens em uso</div>
+            <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-color);">
+              ${coursesWithManyPending.map(c => `
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; font-size: 14px;">
+                  <span style="color: var(--text-primary); font-weight: 500;">${c.name}</span>
+                  <span style="color: var(--color-warning); font-weight: 700;">${c.count} itens</span>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        ` : ''}
+        
+        <!-- 🔴 ITENS CRÍTICOS - Ação Imediata (Prioridade 1) -->
+        <div class="dashboard-card" style="grid-column: span 2; border-left: 4px solid var(--color-error);">
+          <div class="dashboard-card-icon red">
+            <span class="material-icons">error</span>
+          </div>
+          <div class="dashboard-card-title">🔴 Itens Críticos</div>
+          <div class="dashboard-card-value">${criticalItems}</div>
+          <div class="dashboard-card-subtitle">Ação imediata necessária</div>
+          ${criticalItemsList.length > 0 ? `
+            <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-color);">
+              ${criticalItemsList.map(item => `
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; font-size: 14px;">
+                  <span style="color: var(--text-primary); font-weight: 500;">${item.name}</span>
+                  <span style="color: var(--color-error); font-weight: 700;">${item.quantity} ${item.unit || 'UN'}</span>
+                </div>
+              `).join('')}
+            </div>
+          ` : ''}
+        </div>
+        
+        <!-- 🟡 ITENS EM ATENÇÃO (Prioridade 2) -->
+        <div class="dashboard-card">
+          <div class="dashboard-card-icon yellow">
+            <span class="material-icons">warning</span>
+          </div>
+          <div class="dashboard-card-title">🟡 Estoque em Atenção</div>
+          <div class="dashboard-card-value">${warningItems}</div>
+          <div class="dashboard-card-subtitle">Requer atenção</div>
+        </div>
+        
+        <!-- 🔵 ITENS MAIS USADOS (Prioridade 3) -->
+        <div class="dashboard-card">
+          <div class="dashboard-card-icon blue">
+            <span class="material-icons">trending_up</span>
+          </div>
+          <div class="dashboard-card-title">🔵 Itens Mais Usados</div>
+          <div class="dashboard-card-value">${topWithdrawn.length}</div>
+          <div class="dashboard-card-subtitle">Top itens retirados</div>
+        </div>
+        
+        <!-- 🟢 ESTOQUE OK -->
+        <div class="dashboard-card">
+          <div class="dashboard-card-icon green">
+            <span class="material-icons">check_circle</span>
+          </div>
+          <div class="dashboard-card-title">🟢 Estoque OK</div>
+          <div class="dashboard-card-value">${okItems}</div>
+          <div class="dashboard-card-subtitle">${((okItems / inventory.length) * 100 || 0).toFixed(0)}% do total</div>
+        </div>
+        
+        <!-- 📦 ITENS EM USO POR CURSO/PROJETO -->
+        <div class="dashboard-card">
+          <div class="dashboard-card-icon orange">
+            <span class="material-icons">move_to_inbox</span>
+          </div>
+          <div class="dashboard-card-title">📦 Itens em Uso</div>
+          <div class="dashboard-card-value">${totalInUse.toLocaleString('pt-BR')}</div>
+          <div class="dashboard-card-subtitle">${itemsInUse.length} movimentações ativas</div>
+        </div>
+        
+        <!-- 📊 VISÃO GERAL -->
         <div class="dashboard-card" style="grid-column: span 2;">
           <div class="dashboard-card-icon blue">
             <span class="material-icons">inventory_2</span>
@@ -5132,60 +5555,18 @@
           <div class="dashboard-card-title">Total de Itens no Estoque</div>
           <div class="dashboard-card-value">${inventory.length}</div>
           <div class="dashboard-card-subtitle">${totalQuantity.toLocaleString('pt-BR')} unidades totais</div>
-        </div>
-        
-        <div class="dashboard-card">
-          <div class="dashboard-card-icon blue">
-            <span class="material-icons">location_on</span>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-color);">
+            <div>
+              <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 4px;">ADM</div>
+              <div style="font-size: 20px; font-weight: 700; color: var(--text-primary);">${admTotal.toLocaleString('pt-BR')}</div>
+              <div style="font-size: 11px; color: var(--text-secondary);">${admItems.length} tipos</div>
+            </div>
+            <div>
+              <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 4px;">IAC-SOCIAL</div>
+              <div style="font-size: 20px; font-weight: 700; color: var(--text-primary);">${iacTotal.toLocaleString('pt-BR')}</div>
+              <div style="font-size: 11px; color: var(--text-secondary);">${iacItems.length} tipos</div>
+            </div>
           </div>
-          <div class="dashboard-card-title">Itens em ADM</div>
-          <div class="dashboard-card-value">${admTotal.toLocaleString('pt-BR')}</div>
-          <div class="dashboard-card-subtitle">${admItems.length} tipos diferentes</div>
-        </div>
-        
-        <div class="dashboard-card">
-          <div class="dashboard-card-icon blue">
-            <span class="material-icons">location_on</span>
-          </div>
-          <div class="dashboard-card-title">Itens em IAC-SOCIAL</div>
-          <div class="dashboard-card-value">${iacTotal.toLocaleString('pt-BR')}</div>
-          <div class="dashboard-card-subtitle">${iacItems.length} tipos diferentes</div>
-        </div>
-        
-        <div class="dashboard-card">
-          <div class="dashboard-card-icon orange">
-            <span class="material-icons">move_to_inbox</span>
-          </div>
-          <div class="dashboard-card-title">Itens em Uso</div>
-          <div class="dashboard-card-value">${totalInUse.toLocaleString('pt-BR')}</div>
-          <div class="dashboard-card-subtitle">${itemsInUse.length} movimentações ativas</div>
-        </div>
-        
-        <div class="dashboard-card">
-          <div class="dashboard-card-icon green">
-            <span class="material-icons">check_circle</span>
-          </div>
-          <div class="dashboard-card-title">Estoque OK</div>
-          <div class="dashboard-card-value">${okItems}</div>
-          <div class="dashboard-card-subtitle">${((okItems / inventory.length) * 100 || 0).toFixed(0)}% do total</div>
-        </div>
-        
-        <div class="dashboard-card">
-          <div class="dashboard-card-icon yellow">
-            <span class="material-icons">warning</span>
-          </div>
-          <div class="dashboard-card-title">Estoque em Atenção</div>
-          <div class="dashboard-card-value">${warningItems}</div>
-          <div class="dashboard-card-subtitle">Requer atenção</div>
-        </div>
-        
-        <div class="dashboard-card">
-          <div class="dashboard-card-icon red">
-            <span class="material-icons">error</span>
-          </div>
-          <div class="dashboard-card-title">Estoque Crítico</div>
-          <div class="dashboard-card-value">${criticalItems}</div>
-          <div class="dashboard-card-subtitle">Ação imediata necessária</div>
         </div>
         
         <div class="dashboard-card">
@@ -5467,8 +5848,32 @@
       const list = document.getElementById('history-list');
       if (!list) return;
       
+      // Obter todos os filtros
       const filterType = document.getElementById('history-filter-type')?.value || 'all';
+      const filterStatus = document.getElementById('history-filter-status')?.value || 'all';
+      const filterLocation = document.getElementById('history-filter-location')?.value || 'all';
+      const filterProject = document.getElementById('history-filter-project')?.value || 'all';
+      const filterDateFrom = document.getElementById('history-filter-date-from')?.value || '';
+      const filterDateTo = document.getElementById('history-filter-date-to')?.value || '';
       const searchTerm = (document.getElementById('history-search')?.value || '').toLowerCase();
+      
+      // Popular select de projetos
+      const projectSelect = document.getElementById('history-filter-project');
+      if (projectSelect && projects && projects.length > 0) {
+        const currentValue = projectSelect.value;
+        projectSelect.innerHTML = '<option value="all">Todos os Projetos</option>';
+        projects.forEach(project => {
+          if (project && project.name) {
+            const option = document.createElement('option');
+            option.value = project.name;
+            option.textContent = project.name;
+            projectSelect.appendChild(option);
+          }
+        });
+        if (currentValue && currentValue !== 'all') {
+          projectSelect.value = currentValue;
+        }
+      }
       
       // Combinar histórico e withdrawals devolvidos
       let allHistoryItems = [];
@@ -5611,7 +6016,15 @@
       });
       
       if (allHistoryItems.length === 0) {
-        list.innerHTML = '<div class="empty-state">Nenhuma alteração encontrada com os filtros aplicados</div>';
+        list.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">🔍</div>
+            <div class="empty-state-title">Nenhuma alteração encontrada</div>
+            <div class="empty-state-message">
+              Não há registros que correspondam aos filtros aplicados. Tente ajustar os filtros de data ou tipo de ação.
+            </div>
+          </div>
+        `;
         return;
       }
       
@@ -5801,6 +6214,20 @@
       
       list.innerHTML = html;
     }
+    
+    // Função para limpar filtros do histórico
+    function clearHistoryFilters() {
+      document.getElementById('history-filter-type').value = 'all';
+      document.getElementById('history-filter-status').value = 'all';
+      document.getElementById('history-filter-location').value = 'all';
+      document.getElementById('history-filter-project').value = 'all';
+      document.getElementById('history-filter-date-from').value = '';
+      document.getElementById('history-filter-date-to').value = '';
+      document.getElementById('history-search').value = '';
+      renderHistory();
+    }
+    
+    window.clearHistoryFilters = clearHistoryFilters;
 
     function navigateTo(page, element) {
       document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
@@ -7053,15 +7480,23 @@
       deleteItem(itemId);
     }
 
+    // Variável para armazenar último item excluído (para undo)
+    let lastDeletedItem = null;
+    let lastDeletedItemId = null;
+
     async function deleteItem() {
       if (!currentItem) {
         showToast('Item não encontrado', 'error');
         return;
       }
       
-      if (!confirm(`Tem certeza que deseja excluir o item "${currentItem.name}"? Esta ação não pode ser desfeita.`)) {
+      if (!confirm(`Tem certeza que deseja excluir o item "${currentItem.name}"?`)) {
         return;
       }
+      
+      // Salvar cópia do item para possível undo
+      lastDeletedItem = JSON.parse(JSON.stringify(currentItem));
+      lastDeletedItemId = currentItem.id;
       
       try {
         if (window.db) {
@@ -7080,12 +7515,64 @@
         localStorage.setItem('inventory', JSON.stringify(inventory));
         
         logActivity('Exclusão', `Excluiu o item ${currentItem.name}`, 'delete');
-        showToast('Item excluído com sucesso!', 'success');
+        
+        // Função de undo
+        const undoDelete = async () => {
+          if (!lastDeletedItem) return;
+          
+          try {
+            // Restaurar item no Firestore
+            if (window.db) {
+              try {
+                const { setDoc, doc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+                await setDoc(doc(window.db, 'inventory', String(lastDeletedItem.id)), lastDeletedItem);
+              } catch (firestoreError) {
+                console.warn('Erro ao restaurar no Firestore:', firestoreError);
+              }
+            }
+            
+            // Restaurar localmente
+            inventory.push(lastDeletedItem);
+            localStorage.setItem('inventory', JSON.stringify(inventory));
+            
+            // Sincronizar com Realtime Database
+            if (window.autoSyncToRealtimeDB) {
+              await window.autoSyncToRealtimeDB('inventory', inventory);
+            }
+            
+            logActivity('Restauração', `Restaurou o item ${lastDeletedItem.name}`, 'restore');
+            showToast('Item restaurado com sucesso!', 'success');
+            renderInventory();
+            
+            // Limpar referência
+            lastDeletedItem = null;
+            lastDeletedItemId = null;
+          } catch (error) {
+            console.error('Erro ao restaurar item:', error);
+            showToast('Erro ao restaurar item.', 'error');
+          }
+        };
+        
+        showToast('Item excluído com sucesso!', 'success', {
+          duration: 8000,
+          undo: undoDelete
+        });
+        
         closeModal('edit-item-modal');
         renderInventory();
+        
+        // Limpar referência após 10 segundos (se não foi usado undo)
+        setTimeout(() => {
+          if (lastDeletedItemId === currentItem.id) {
+            lastDeletedItem = null;
+            lastDeletedItemId = null;
+          }
+        }, 10000);
       } catch (error) {
         console.error('Erro ao excluir item:', error);
         showToast('Erro ao excluir item. Tente novamente.', 'error');
+        lastDeletedItem = null;
+        lastDeletedItemId = null;
       }
     }
 
@@ -7330,7 +7817,19 @@
       console.log('Renderizando withdrawals. Total:', withdrawals.length);
       
       if (!withdrawals || withdrawals.length === 0) {
-        content.innerHTML = '<div class="empty-state">Nenhum item retirado encontrado. Quando você retirar um item do estoque, ele aparecerá aqui.</div>';
+        content.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">📤</div>
+            <div class="empty-state-title">Nenhum item retirado encontrado</div>
+            <div class="empty-state-message">
+              Quando você retirar um item do estoque, ele aparecerá aqui com todas as informações de movimentação.
+            </div>
+            <button class="empty-state-action" onclick="showPage('inventory-page')">
+              <span class="material-icons" style="font-size: 18px; vertical-align: middle; margin-right: 4px;">inventory_2</span>
+              Ver Estoque
+            </button>
+          </div>
+        `;
         return;
       }
       
@@ -8339,6 +8838,9 @@
         await saveCourses();
         saveData();
         
+        // Atualizar selects de projetos após criar/editar curso
+        updateProjectSelects();
+        
         // Sempre salvar withdrawals no localStorage (mesmo com Firestore, para fallback)
         try {
           localStorage.setItem('withdrawals', JSON.stringify(withdrawals));
@@ -8614,6 +9116,9 @@
         }
         
         syncCoursesWithProjects();
+        
+        // Atualizar selects de projetos após excluir curso
+        updateProjectSelects();
         
         // Atualizar interface
         if (window.renderDrawers) {
